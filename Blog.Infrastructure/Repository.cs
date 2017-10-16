@@ -485,5 +485,22 @@ namespace Blog.Infrastructure
         /// </summary>
         /// <param name="entities">The entities.</param>
         public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
+
+        public virtual IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _dbContext.Set<TEntity>().Where(predicate);
+        }
+
+        public virtual IQueryable<TEntity> AllIncluding(
+           params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return query;
+        }
     }
 }

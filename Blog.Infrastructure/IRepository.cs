@@ -254,5 +254,14 @@ namespace Blog.Infrastructure
         /// </summary>
         /// <param name="entities">The entities.</param>
         void Delete(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        /// Find Data Linq
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate);
+
+        IQueryable<TEntity> AllIncluding(params Expression<Func<TEntity, object>>[] includeProperties);
     }
 }

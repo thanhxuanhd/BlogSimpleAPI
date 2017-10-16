@@ -9,15 +9,21 @@ namespace Blog.Service.Mapping
 {
     public class DomainMappingToDtoProfile : Profile
     {
-        public override string ProfileName => "DomainToDtoMappingProfile";
+        public override string ProfileName => "DomainMappingToDtoProfile";
         public DomainMappingToDtoProfile()
         {
             CreateMap<PostCategory, PostCategoryViewModel>();
+            CreateMap<Post, PostViewModel>();
+            CreateMap<Comment, CommentViewModel>();
+
             CreateMap<PostCategory, SimpleSelectItem>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(dt => dt.Id))
                 .ForMember(x => x.Name, opt => opt.MapFrom(dt => dt.CategoryName));
-            CreateMap<Post, PostViewModel>();
-            CreateMap<Comment, CommentViewModel>();
+            //
+            CreateMap<PostCategoryViewModel, PostCategory>();
+            CreateMap<PostViewModel, Post>();
+            CreateMap<CommentViewModel, Comment>();
+            CreateMap<UserViewModel, User>();
         }
 
     }
