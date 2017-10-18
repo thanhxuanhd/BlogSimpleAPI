@@ -13,13 +13,17 @@ namespace Blog.Service.Service
 {
     public class UserService : IUserService
     {
-        private IUserRepository _userRepository;
+        private IUnitOfWork _unitOfWork;
+        //private IUserRepository _userRepository;
+        private IRepository<User> _userRepository;
         private UserManager<User> _userMaganer;
 
-        public UserService(IUserRepository userRepository, UserManager<User> userMaganer)
+        public UserService(UserManager<User> userMaganer, IUnitOfWork unitOfWork)
         {
-            //_unitOfWork = unitOfWork;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
+
+            //_userRepository = userRepository;
+            _userRepository = _unitOfWork.GetRepository<User>();
             _userMaganer = userMaganer;
         }
 
@@ -43,7 +47,9 @@ namespace Blog.Service.Service
 
         public List<UserViewModel> GetList(int page, int pageSize, string keyWord = "", string sort = "", bool desc = false)
         {
-            throw new NotImplementedException();
+            var query = _userRepository.GetPagedList().Items;
+            var users = Mapper.Map<List<User>, List<UserViewModel>>(query.ToList());
+            return users;
         }
 
         public bool Update(UserViewModel user)

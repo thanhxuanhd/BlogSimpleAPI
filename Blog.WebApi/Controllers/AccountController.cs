@@ -4,6 +4,7 @@ using Blog.Service.Interface;
 using Blog.Service.ViewModels;
 using Blog.WebApi.Auth;
 using Blog.WebApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,8 +16,8 @@ using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
 {
-    [Produces("application/json")]
     [Route("api/Account")]
+    [Authorize]
     public class AccountController : Controller
     {
         private IUserService _userService;
@@ -54,7 +55,7 @@ namespace Blog.WebApi.Controllers
             var userId = await _userManager.CreateAsync(user, model.Password);
             return Ok(userId);
         }
-
+        [AllowAnonymous]
         [HttpPost("Login", Name = "Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
         {
@@ -81,6 +82,13 @@ namespace Blog.WebApi.Controllers
             return new OkObjectResult(response);
         }
 
+        [HttpGet(Name = "GetUser")]
+        public IActionResult GetUser()
+        {
+            var users = _userService.GetList(0, 0);
+            return Json(users);
+        }
+
         private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)
         {
             if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
@@ -101,5 +109,6 @@ namespace Blog.WebApi.Controllers
             // Credentials are invalid, or account doesn't exist
             return await Task.FromResult<ClaimsIdentity>(null);
         }
+
     }
 }

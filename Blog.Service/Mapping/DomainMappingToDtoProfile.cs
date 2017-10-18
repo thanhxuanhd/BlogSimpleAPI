@@ -15,6 +15,7 @@ namespace Blog.Service.Mapping
             CreateMap<PostCategory, PostCategoryViewModel>();
             CreateMap<Post, PostViewModel>();
             CreateMap<Comment, CommentViewModel>();
+            CreateMap<User, UserViewModel>();
 
             CreateMap<PostCategory, SimpleSelectItem>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(dt => dt.Id))

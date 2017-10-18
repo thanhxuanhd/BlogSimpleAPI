@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Blog.Core.Repository;
 using Blog.Core.Interface;
 using Blog.WebApi.Auth;
+using Blog.Infrastructure;
 
 namespace Blog.WebApi
 {
@@ -38,14 +39,14 @@ namespace Blog.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BlogDbContext>(options =>
-                     options.UseSqlServer(Configuration.GetConnectionString("BlogDbContext"), b => b.MigrationsAssembly("Blog.WebApi")));
+                     options.UseSqlServer(Configuration.GetConnectionString("BlogDbContext"), b => b.MigrationsAssembly("Blog.WebApi")))
+                     .AddUnitOfWork<BlogDbContext>(); ;
 
             services.AddIdentity<User, UserRole>()
                     .AddEntityFrameworkStores<BlogDbContext>()
                     .AddDefaultTokenProviders();
 
             SetUpService(services);
-           
             services.AddMvc();
         }
 
@@ -57,11 +58,12 @@ namespace Blog.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-           
-
-
             app.UseStaticFiles();
             app.UseAuthentication();
+            app.UseCors(option =>
+            {
+                option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials();
+            });
             app.UseMvc();
         }
 
@@ -98,12 +100,14 @@ namespace Blog.WebApi
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
                 options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
                 options.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
                 options.TokenValidationParameters = tokenValidationParameters;
                 options.SaveToken = true;
+                options.IncludeErrorDetails = true;
             });
 
             //api user claim policy
@@ -113,9 +117,11 @@ namespace Blog.WebApi
             });
 
             //Repository
-            services.AddScoped<IUserRepository, UserRepository>();
+            //services.AddScoped<IUserRepository, UserRepository>();
             //Service
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPostCategoryService, PostCategoryService>();
+            services.AddScoped<IPostService, PostService>();
             services.AddScoped<IJwtFactory, JwtFactory>();
 
             Mapper.Initialize(x =>
@@ -140,16 +146,6 @@ namespace Blog.WebApi
 
                 // User settings
                 options.User.RequireUniqueEmail = true;
-            });
-            services.ConfigureApplicationCookie(options =>
-            {
-                // Cookie settings
-                options.Cookie.HttpOnly = true;
-                options.Cookie.Expiration = TimeSpan.FromDays(150);
-                options.LoginPath = "/Account/Login"; // If the LoginPath is not set here, ASP.NET Core will default to /Account/Login
-                options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
-                options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
-                options.SlidingExpiration = true;
             });
 
             // Add framework services.
