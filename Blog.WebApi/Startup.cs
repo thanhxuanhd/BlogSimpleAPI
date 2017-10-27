@@ -101,6 +101,7 @@ namespace Blog.WebApi
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
                 options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
