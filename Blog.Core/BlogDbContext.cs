@@ -6,7 +6,7 @@ using System;
 
 namespace Blog.Core
 {
-    public class BlogDbContext : IdentityDbContext<User, UserRole,Guid>
+    public class BlogDbContext : IdentityDbContext<User, UserRole, Guid>
     {
         public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
         {
@@ -14,6 +14,7 @@ namespace Blog.Core
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().ToTable("AppUsers").HasKey(x => x.Id);
             modelBuilder.Entity<UserRole>().ToTable("AppRoles").HasKey(x => x.Id);
 
             modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("AppUserClaims").HasKey(x => x.Id);
@@ -29,6 +30,9 @@ namespace Blog.Core
             modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AppUserTokens")
                .HasKey(x => new { x.UserId });
 
+            modelBuilder.Entity<PostTag>().ToTable("PostTags")
+             .HasKey(x => new { x.PostID, x.TagID });
+
 
             modelBuilder.EnableAutoHistory();
         }
@@ -36,5 +40,8 @@ namespace Blog.Core
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<PostCategory> PostCategorys { get; set; }
+        public DbSet<Page> Pages { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<PostTag> PostTags { get; set; }
     }
 }

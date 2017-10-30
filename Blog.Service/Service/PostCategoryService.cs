@@ -5,6 +5,8 @@ using System.Text;
 using Blog.Service.ViewModels;
 using Blog.Infrastructure;
 using Blog.Core.Model;
+using System.Linq;
+using AutoMapper;
 
 namespace Blog.Service.Service
 {
@@ -23,9 +25,17 @@ namespace Blog.Service.Service
             throw new NotImplementedException();
         }
 
-        public List<PostCategoryViewModel> Get(int pageIndex, int pageSize, string sortColumn)
+        public List<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord,string sortColumn)
         {
-            throw new NotImplementedException();
+            var query = _postCategoryRepository.FindBy(x => !x.DeleteBy.HasValue);
+            if (!string.IsNullOrEmpty(keyWord))
+            {
+                query = query.Where(x => x.CategoryName.Contains(keyWord));
+            }
+
+            var listpostCategorys = query.OrderBy(x=>x.CategoryName).Skip(pageIndex * pageSize).Take(pageSize).ToList();
+            var listPostCategoryViewModel = Mapper.Map<List<PostCategory>, List<PostCategoryViewModel>>(listpostCategorys);
+            return listPostCategoryViewModel;
         }
 
         public PostCategoryViewModel GetById(Guid id)

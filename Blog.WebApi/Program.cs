@@ -29,7 +29,8 @@ namespace Blog.WebApi
                 {
                     var context = services.GetRequiredService<BlogDbContext>();
                     var userManager = services.GetRequiredService<UserManager<User>>();
-                    BlogDbInitializer.Initializer(context,userManager);
+                    var roleManager = services.GetRequiredService<RoleManager<UserRole>>();
+                    BlogDbInitializer.Initializer(context, userManager, roleManager);
                 }
                 catch (Exception ex)
                 {

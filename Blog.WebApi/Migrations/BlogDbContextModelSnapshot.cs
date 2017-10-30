@@ -50,6 +50,38 @@ namespace Blog.WebApi.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("Blog.Core.Model.Page", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasMaxLength(256);
+
+                    b.Property<Guid?>("ChangeBy");
+
+                    b.Property<DateTime?>("ChangeOn");
+
+                    b.Property<string>("Content");
+
+                    b.Property<Guid>("CreateBy");
+
+                    b.Property<DateTime>("CreateOn");
+
+                    b.Property<Guid?>("DeleteBy");
+
+                    b.Property<DateTime?>("DeleteOn");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pages");
+                });
+
             modelBuilder.Entity("Blog.Core.Model.Post", b =>
                 {
                     b.Property<Guid>("Id")
@@ -131,6 +163,50 @@ namespace Blog.WebApi.Migrations
                     b.ToTable("PostCategorys");
                 });
 
+            modelBuilder.Entity("Blog.Core.Model.PostTag", b =>
+                {
+                    b.Property<Guid>("PostID");
+
+                    b.Property<Guid>("TagID")
+                        .HasMaxLength(50);
+
+                    b.HasKey("PostID", "TagID");
+
+                    b.HasIndex("TagID");
+
+                    b.ToTable("PostTags");
+                });
+
+            modelBuilder.Entity("Blog.Core.Model.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid?>("ChangeBy");
+
+                    b.Property<DateTime?>("ChangeOn");
+
+                    b.Property<Guid>("CreateBy");
+
+                    b.Property<DateTime>("CreateOn");
+
+                    b.Property<Guid?>("DeleteBy");
+
+                    b.Property<DateTime?>("DeleteOn");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("Blog.Core.Model.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -174,7 +250,7 @@ namespace Blog.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("AppUsers");
                 });
 
             modelBuilder.Entity("Blog.Core.Model.UserRole", b =>
@@ -183,6 +259,9 @@ namespace Blog.WebApi.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConcurrencyStamp");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(256);
 
                     b.Property<string>("Name");
 
@@ -204,7 +283,11 @@ namespace Blog.WebApi.Migrations
 
                     b.Property<Guid>("RoleId");
 
+                    b.Property<Guid?>("UserId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("AppRoleClaims");
                 });
@@ -222,6 +305,8 @@ namespace Blog.WebApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("AppUserClaims");
                 });
 
@@ -236,7 +321,11 @@ namespace Blog.WebApi.Migrations
 
                     b.Property<string>("ProviderKey");
 
+                    b.Property<Guid?>("UserId1");
+
                     b.HasKey("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("AppUserLogins");
                 });
@@ -248,6 +337,8 @@ namespace Blog.WebApi.Migrations
                     b.Property<Guid>("UserId");
 
                     b.HasKey("RoleId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("AppUserRoles");
                 });
@@ -261,9 +352,13 @@ namespace Blog.WebApi.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<Guid?>("UserId1");
+
                     b.Property<string>("Value");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("AppUserTokens");
                 });
@@ -313,6 +408,56 @@ namespace Blog.WebApi.Migrations
                     b.HasOne("Blog.Core.Model.PostCategory")
                         .WithMany("PostCagegorys")
                         .HasForeignKey("PostCategoryId");
+                });
+
+            modelBuilder.Entity("Blog.Core.Model.PostTag", b =>
+                {
+                    b.HasOne("Blog.Core.Model.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Blog.Core.Model.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("Blog.Core.Model.User")
+                        .WithMany("AppRoleClaims")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+                {
+                    b.HasOne("Blog.Core.Model.User")
+                        .WithMany("AppUserClaims")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+                {
+                    b.HasOne("Blog.Core.Model.User")
+                        .WithMany("AppUserLogins")
+                        .HasForeignKey("UserId1");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.HasOne("Blog.Core.Model.User")
+                        .WithMany("AppUserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.HasOne("Blog.Core.Model.User")
+                        .WithMany("AppUserTokens")
+                        .HasForeignKey("UserId1");
                 });
 #pragma warning restore 612, 618
         }

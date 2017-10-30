@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -17,24 +18,25 @@ using System.Threading.Tasks;
 namespace Blog.WebApi.Controllers
 {
     [Route("api/Account")]
-    [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseController<AccountController>
     {
         private IUserService _userService;
         private UserManager<User> _userManager;
+        private RoleManager<UserRole> _roleManager;
         private ILogger<AccountController> _logger;
 
         private readonly IJwtFactory _jwtFactory;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JwtIssuerOptions _jwtOptions;
 
-        public AccountController(IUserService userService, UserManager<User> userManager, ILogger<AccountController> logger, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public AccountController(IUserService userService, UserManager<User> userManager, ILogger<AccountController> logger, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, RoleManager<UserRole> roleManager) : base(logger)
         {
             _userService = userService;
             _userManager = userManager;
             _logger = logger;
             _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
+            _roleManager = roleManager;
 
             _serializerSettings = new JsonSerializerSettings
             {
@@ -65,18 +67,30 @@ namespace Blog.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                return BadRequest("User not exits");
+            }
             var identity = await GetClaimsIdentity(model.UserName, model.Password);
+
+
             if (identity == null)
             {
                 return BadRequest(ModelState);
             }
 
+            var role = await _userManager.GetRolesAsync(user);
+            identity.AddClaim(new Claim("fullName", user.FullName));
+            identity.AddClaim(new Claim("email", user.Email));
             // Serialize and return the response
             var response = new
             {
                 id = identity.Claims.Single(c => c.Type == "id").Value,
                 auth_token = await _jwtFactory.GenerateEncodedToken(model.UserName, identity),
-                expires_in = (int)_jwtOptions.ValidFor.TotalSeconds
+                expires_in = (int)_jwtOptions.ValidFor.TotalSeconds,
+                role = role,
+                fullName = identity.Claims.Single(c => c.Type == "fullName").Value
             };
 
             return new OkObjectResult(response);
@@ -87,6 +101,16 @@ namespace Blog.WebApi.Controllers
         {
             var users = _userService.GetList(0, 0);
             return Json(users);
+        }
+
+        [HttpGet("{Id}")]
+        public IActionResult GetById(Guid Id)
+        {
+            return DoActionWithReturnResult(() =>
+           {
+               var users = _userService.GetById(Id);
+               return Json(users);
+           });
         }
 
         private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)

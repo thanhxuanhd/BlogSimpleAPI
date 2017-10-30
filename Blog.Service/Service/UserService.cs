@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Blog.Core.Extensions;
 using Blog.Core.Interface;
 using Blog.Core.Model;
 using Blog.Infrastructure;
@@ -55,6 +56,25 @@ namespace Blog.Service.Service
         public bool Update(UserViewModel user)
         {
             throw new NotImplementedException();
+        }
+
+        public UserWidthRoleViewModel GetById(Guid Id)
+        {
+            var user = _userMaganer.FindByIdAsync(Id.ToString()).Result;
+            if (user == null)
+            {
+                throw new BlogException("UserNotFound");
+            }
+            var roles = _userMaganer.GetRolesAsync(user).Result;
+            return new UserWidthRoleViewModel()
+            {
+                BirthDay = user.BirthDay,
+                FullName = user.FullName,
+                Roles = roles.ToList(),
+                Email = user.Email,
+                Id = user.Id
+            };
+
         }
 
         private bool IsDuplicateUser(User user)

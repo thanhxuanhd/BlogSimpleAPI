@@ -46,6 +46,8 @@ namespace Blog.WebApi
                     .AddEntityFrameworkStores<BlogDbContext>()
                     .AddDefaultTokenProviders();
 
+            services.AddScoped<IPostCategoryService, PostCategoryService>();
+
             SetUpService(services);
             services.AddMvc();
         }
