@@ -21,6 +21,7 @@ using Blog.Core.Repository;
 using Blog.Core.Interface;
 using Blog.WebApi.Auth;
 using Blog.Infrastructure;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Blog.WebApi
 {
@@ -66,6 +67,16 @@ namespace Blog.WebApi
             {
                 option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials();
             });
+            
+
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("../swagger/v1/swagger.json", "My API V1");
+            });
+
             app.UseMvc();
         }
 
@@ -127,10 +138,10 @@ namespace Blog.WebApi
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IJwtFactory, JwtFactory>();
 
-            Mapper.Initialize(x =>
-            {
-                x.AddProfile<DomainMappingToDtoProfile>();
-            });
+            // Auto Mapper Config For Asp.Net Core
+            services.AddAutoMapper();
+            services.AddSingleton(Mapper.Configuration);
+            services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -146,7 +157,7 @@ namespace Blog.WebApi
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Lockout.AllowedForNewUsers = true;
-
+                
                 // User settings
                 options.User.RequireUniqueEmail = true;
             });
@@ -159,6 +170,10 @@ namespace Blog.WebApi
             }).AddViewLocalization()
                 .AddDataAnnotationsLocalization();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
+            });
 
         }
     }

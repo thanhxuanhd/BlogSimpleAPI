@@ -33,8 +33,7 @@ namespace Blog.Core
             modelBuilder.Entity<PostTag>().ToTable("PostTags")
              .HasKey(x => new { x.PostID, x.TagID });
 
-
-            modelBuilder.EnableAutoHistory();
+            modelBuilder.EnableAutoHistory(0);
         }
 
         public DbSet<Post> Posts { get; set; }

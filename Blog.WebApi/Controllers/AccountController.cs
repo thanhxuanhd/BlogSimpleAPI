@@ -83,14 +83,15 @@ namespace Blog.WebApi.Controllers
             var role = await _userManager.GetRolesAsync(user);
             identity.AddClaim(new Claim("fullName", user.FullName));
             identity.AddClaim(new Claim("email", user.Email));
+            var token = await _jwtFactory.GenerateEncodedToken(model.UserName, identity);
             // Serialize and return the response
-            var response = new
+            var response = new AuthenResponseModel
             {
-                id = identity.Claims.Single(c => c.Type == "id").Value,
-                auth_token = await _jwtFactory.GenerateEncodedToken(model.UserName, identity),
-                expires_in = (int)_jwtOptions.ValidFor.TotalSeconds,
-                role = role,
-                fullName = identity.Claims.Single(c => c.Type == "fullName").Value
+                Id = identity.Claims.Single(c => c.Type == "id").Value,
+                AuthenToken = token,
+                ExpiresIn = (int)_jwtOptions.ValidFor.TotalSeconds,
+                Roles = role.ToList(),
+                FullName = identity.Claims.Single(c => c.Type == "fullName").Value
             };
 
             return new OkObjectResult(response);

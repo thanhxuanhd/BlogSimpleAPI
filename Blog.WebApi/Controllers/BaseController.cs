@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Blog.WebApi.Controllers
 {
     [Authorize]
+    [Route("api/[controller]")]
     public class BaseController<T> : Controller
     {
         #region Properties
@@ -29,7 +30,7 @@ namespace Blog.WebApi.Controllers
             {
                 var identity = (ClaimsPrincipal)HttpContext.User;
                 IEnumerable<Claim> claims = identity.Claims;
-                var accountId = claims.Where(c => c.Type == "Id")
+                var accountId = claims.Where(c => c.Type.ToLower().Equals("id"))
                                    .Select(c => c.Value).SingleOrDefault();
                 if (!string.IsNullOrEmpty(accountId))
                 {
@@ -64,7 +65,7 @@ namespace Blog.WebApi.Controllers
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
-                response = StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                response = StatusCode((int)HttpStatusCode.InternalServerError, "ERROR_SYSTEM");
             }
 
             return response;

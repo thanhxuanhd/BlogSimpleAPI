@@ -1,12 +1,13 @@
-﻿using Blog.Service.Interface;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Blog.Core.Extensions;
+using Blog.Core.Model;
+using Blog.Infrastructure;
+using Blog.Service.Interface;
+using Blog.Service.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Blog.Service.ViewModels;
-using Blog.Infrastructure;
-using Blog.Core.Model;
 using System.Linq;
-using AutoMapper;
 
 namespace Blog.Service.Service
 {
@@ -14,18 +15,39 @@ namespace Blog.Service.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<PostCategory> _postCategoryRepository;
+
         public PostCategoryService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _postCategoryRepository = unitOfWork.GetRepository<PostCategory>();
-
         }
-        public Guid Add(PostCategoryViewModel post)
+
+        public Guid Add(PostCategoryViewModel post, Guid currentUserId)
         {
-            throw new NotImplementedException();
+            var entity = Mapper.Map<PostCategoryViewModel, PostCategory>(post);
+            entity.Id = Guid.NewGuid();
+            entity.CreateBy = currentUserId;
+            entity.CreateOn = DateTime.UtcNow;
+            _postCategoryRepository.Insert(entity);
+            return entity.Id;
         }
 
-        public List<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord,string sortColumn)
+        public bool Delete(Guid id, Guid currentUserId)
+        {
+            var entity = _postCategoryRepository.FindBy(x => x.Id == id && !x.DeleteBy.HasValue).FirstOrDefault();
+
+            if (entity == null)
+            {
+                return false;
+            }
+            entity.DeleteBy = currentUserId;
+            entity.DeleteOn = DateTime.UtcNow;
+            _postCategoryRepository.Update(entity);
+
+            return true;
+        }
+
+        public List<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord, string sortColumn)
         {
             var query = _postCategoryRepository.FindBy(x => !x.DeleteBy.HasValue);
             if (!string.IsNullOrEmpty(keyWord))
@@ -33,19 +55,58 @@ namespace Blog.Service.Service
                 query = query.Where(x => x.CategoryName.Contains(keyWord));
             }
 
-            var listpostCategorys = query.OrderBy(x=>x.CategoryName).Skip(pageIndex * pageSize).Take(pageSize).ToList();
-            var listPostCategoryViewModel = Mapper.Map<List<PostCategory>, List<PostCategoryViewModel>>(listpostCategorys);
-            return listPostCategoryViewModel;
+            var listpostCategorys = query.OrderBy(x => x.CategoryName).Skip(pageIndex * pageSize).Take(pageSize).ProjectTo<PostCategoryViewModel>().ToList();
+            return listpostCategorys;
         }
 
         public PostCategoryViewModel GetById(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = _postCategoryRepository.AllIncluding(x => x.Posts, x=>x.PostCategories)
+                .Where(x => x.Id == id && !x.DeleteBy.HasValue).FirstOrDefault();
+
+            if (entity == null)
+            {
+                throw new BlogException("POST_CATEGORY_NOT_FOUND");
+            }
+            return Mapper.Map<PostCategory, PostCategoryViewModel>(entity);
         }
 
-        public bool Update(PostCategoryViewModel post)
+        public void Save()
         {
-            throw new NotImplementedException();
+            _unitOfWork.SaveChanges();
+        }
+
+        public bool Update(PostCategoryViewModel post, Guid currentUserId)
+        {
+            var entity = _postCategoryRepository.FindBy(x => x.Id == post.Id && !x.DeleteBy.HasValue).FirstOrDefault();
+
+            if (entity == null)
+            {
+                return false;
+            }
+
+            var entityUpdate = Mapper.Map<PostCategoryViewModel, PostCategory>(post);
+            entity.ChangeBy = currentUserId;
+            entity.ChangeOn = DateTime.UtcNow;
+            _postCategoryRepository.Update(entityUpdate);
+
+            return true;
+        }
+
+        public void UpdateParent(PostCategoryUpdateParentViewModel model, Guid currentUserId)
+        {
+            var entity = _postCategoryRepository.FindBy(x => x.Id == model.Id && !x.DeleteBy.HasValue).FirstOrDefault();
+
+            if (entity == null)
+            {
+                throw new BlogException("POST_CATEGORY_NOT_FOUND");
+            }
+
+            entity.ParentId = model.ParentId;
+            entity.ChangeBy = currentUserId;
+            entity.ChangeOn = DateTime.UtcNow;
+
+            _postCategoryRepository.Update(entity);
         }
     }
 }
