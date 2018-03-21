@@ -18,6 +18,8 @@ namespace Blog.WebApi.Models
         /// </summary>
         public string Subject { get; set; }
 
+        public string SecretKey { get; set; }
+
         /// <summary>
         /// 4.1.3.  "aud" (Audience) Claim - The "aud" (audience) claim identifies the recipients that the JWT is intended for.
         /// </summary>

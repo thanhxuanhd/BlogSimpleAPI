@@ -42,9 +42,19 @@ namespace Blog.WebApi
             host.Run();
         }
 
+        private static void SetupConfiguration(WebHostBuilderContext hostingContext, IConfigurationBuilder configBuilder)
+        {
+            configBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            configBuilder.AddEnvironmentVariables();
+
+            var configuration = configBuilder.Build();
+        }
+
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .ConfigureAppConfiguration(SetupConfiguration)
                 .Build();
     }
 }

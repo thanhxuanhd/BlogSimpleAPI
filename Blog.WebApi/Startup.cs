@@ -22,13 +22,13 @@ using Blog.Core.Interface;
 using Blog.WebApi.Auth;
 using Blog.Infrastructure;
 using Swashbuckle.AspNetCore.Swagger;
+using Blog.WebApi.Middleware;
 
 namespace Blog.WebApi
 {
     public class Startup
     {
         private const string SecretKey = "ja1XBRwlCBB3Xm68YIAK2A788YNrDoP9"; // todo: get this from somewhere secure
-        private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -60,14 +60,13 @@ namespace Blog.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseMiddleware<TokenRequestMiddleware>();
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseCors(option =>
             {
                 option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials();
             });
-            
 
             app.UseSwagger();
 
@@ -76,7 +75,6 @@ namespace Blog.WebApi
             {
                 c.SwaggerEndpoint("../swagger/v1/swagger.json", "My API V1");
             });
-
             app.UseMvc();
         }
 
@@ -87,13 +85,14 @@ namespace Blog.WebApi
             /// Config jwtOption Authen Service
             ///
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
-
+            SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtAppSettingOptions[nameof(JwtIssuerOptions.SecretKey)]));
             services.Configure<JwtIssuerOptions>(options =>
-            {
-                options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
-                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
-            });
+                {
+                    options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                    options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
+                    options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+                    options.SecretKey = jwtAppSettingOptions[nameof(JwtIssuerOptions.SecretKey)];
+                });
 
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -111,24 +110,26 @@ namespace Blog.WebApi
                 ClockSkew = TimeSpan.Zero
             };
             services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
-                options.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                options.TokenValidationParameters = tokenValidationParameters;
-                options.SaveToken = true;
-                options.IncludeErrorDetails = true;
-            });
+                    {
+                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+
+                    }).AddJwtBearer(options =>
+                    {
+                        options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
+                        options.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
+                        options.TokenValidationParameters = tokenValidationParameters;
+                        options.SaveToken = true;
+                        options.IncludeErrorDetails = true;
+
+                    }).AddCookie();
 
             //api user claim policy
             services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
-            });
+                        {
+                            options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
+                        });
 
             //Repository
             //services.AddScoped<IUserRepository, UserRepository>();
@@ -136,7 +137,8 @@ namespace Blog.WebApi
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPostCategoryService, PostCategoryService>();
             services.AddScoped<IPostService, PostService>();
-            services.AddScoped<IJwtFactory, JwtFactory>();
+            services.AddTransient<IJwtFactory, JwtFactory>();
+            services.Configure<Configurations>(options => Configuration.GetSection(nameof(Configurations)).Bind(options));
 
             // Auto Mapper Config For Asp.Net Core
             services.AddAutoMapper();
@@ -157,7 +159,7 @@ namespace Blog.WebApi
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Lockout.AllowedForNewUsers = true;
-                
+
                 // User settings
                 options.User.RequireUniqueEmail = true;
             });
@@ -171,9 +173,9 @@ namespace Blog.WebApi
                 .AddDataAnnotationsLocalization();
 
             services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
-            });
+                        {
+                            c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
+                        });
 
         }
     }

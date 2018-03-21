@@ -8,5 +8,7 @@ namespace Blog.WebApi.Auth
         Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity);
 
         ClaimsIdentity GenerateClaimsIdentity(string userName, string id);
+
+        bool ValidateTokenAsync(string token);
     }
 }

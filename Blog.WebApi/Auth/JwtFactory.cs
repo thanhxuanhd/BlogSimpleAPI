@@ -1,24 +1,34 @@
 ﻿using Blog.WebApi.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Blog.WebApi.Auth
 {
     public class JwtFactory : IJwtFactory
     {
+        #region Variables
+
         private readonly JwtIssuerOptions _jwtOptions;
+
+        #endregion Variables
+
+        #region Ctor
 
         public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions)
         {
             _jwtOptions = jwtOptions.Value;
             ThrowIfInvalidOptions(_jwtOptions);
         }
+
+        #endregion Ctor
+
+        #region Action
 
         public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
         {
@@ -79,6 +89,36 @@ namespace Blog.WebApi.Auth
                 throw new ArgumentNullException(nameof(JwtIssuerOptions.JtiGenerator));
             }
         }
+
+        #endregion Action
+
+        public bool ValidateTokenAsync(string token)
+        {
+            bool result = false;
+
+            try
+            {
+                SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtOptions.SecretKey));
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var text = tokenHandler.ReadToken(token);
+                SecurityToken validatedToken;
+                TokenValidationParameters validationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = _jwtOptions.Issuer,
+                    ValidAudience = _jwtOptions.Audience,
+                    IssuerSigningKey = _signingKey,
+                };
+
+                IPrincipal principal = tokenHandler.ValidateToken(token.Trim(), validationParameters, out validatedToken);
+
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+
+            return result;
+        }
     }
 }
-

@@ -74,7 +74,6 @@ namespace Blog.WebApi.Controllers
             }
             var identity = await GetClaimsIdentity(model.UserName, model.Password);
 
-
             if (identity == null)
             {
                 return BadRequest(ModelState);
