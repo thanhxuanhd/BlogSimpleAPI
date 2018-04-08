@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -70,13 +71,22 @@ namespace Blog.WebApi.Controllers
             var user = await _userManager.FindByNameAsync(model.UserName);
             if (user == null)
             {
-                return BadRequest("User not exits");
+                return BadRequest(
+                    new ValidationResponse()
+                    {
+                        Key = "UserName",
+                        Errors = new List<string>() { "USER_NOT_FOUND" }
+                    });
             }
             var identity = await GetClaimsIdentity(model.UserName, model.Password);
 
             if (identity == null)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new ValidationResponse()
+                {
+                    Key = "Password",
+                    Errors = new List<string>() { "PASSWORD_IS_CORECT" }
+                });
             }
 
             var role = await _userManager.GetRolesAsync(user);

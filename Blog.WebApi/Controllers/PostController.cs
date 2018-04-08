@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Blog.Service.Interface;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,36 +14,19 @@ namespace Blog.WebApi.Controllers
     [Authorize]
     public class PostController : Controller
     {
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        #region Variables
+        private readonly IPostService _postService;
+        #endregion
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        #region Ctor
+        public PostController(IPostService postService)
         {
-            return "value";
+            _postService = postService;
         }
+        #endregion
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
+        #region Action
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        #endregion
     }
 }
