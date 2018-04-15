@@ -47,16 +47,23 @@ namespace Blog.Service.Service
             return true;
         }
 
-        public List<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord, string sortColumn)
+        public PagingViewModel<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord, string sortColumn)
         {
             var query = _postCategoryRepository.FindBy(x => !x.DeleteBy.HasValue);
             if (!string.IsNullOrEmpty(keyWord))
             {
                 query = query.Where(x => x.CategoryName.Contains(keyWord));
             }
+            var totalCount = query.Count();
 
             var listpostCategorys = query.OrderBy(x => x.CategoryName).Skip(pageIndex * pageSize).Take(pageSize).ProjectTo<PostCategoryViewModel>().ToList();
-            return listpostCategorys;
+            var pages = new PagingViewModel<PostCategoryViewModel>() {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Items = listpostCategorys,
+                TotalCount = totalCount
+            };
+            return pages;
         }
 
         public PostCategoryViewModel GetById(Guid id)

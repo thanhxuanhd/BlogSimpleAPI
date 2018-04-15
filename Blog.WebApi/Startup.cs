@@ -60,7 +60,7 @@ namespace Blog.WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMiddleware<TokenRequestMiddleware>();
+            //app.UseMiddleware<TokenRequestMiddleware>();
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseCors(option =>

@@ -6,7 +6,7 @@ namespace Blog.Service.Interface
 {
     public interface IPostCategoryService
     {
-        List<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord = "", string sortColumn = "");
+        PagingViewModel<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord = "", string sortColumn = "");
 
         Guid Add(PostCategoryViewModel postCategory, Guid currentUserId);
 
