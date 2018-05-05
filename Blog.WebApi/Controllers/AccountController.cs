@@ -25,12 +25,17 @@ namespace Blog.WebApi.Controllers
         private UserManager<User> _userManager;
         private RoleManager<UserRole> _roleManager;
         private ILogger<AccountController> _logger;
+        private SignInManager<User> _signInManager;
 
         private readonly IJwtFactory _jwtFactory;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JwtIssuerOptions _jwtOptions;
 
-        public AccountController(IUserService userService, UserManager<User> userManager, ILogger<AccountController> logger, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, RoleManager<UserRole> roleManager) : base(logger)
+        public AccountController(IUserService userService, UserManager<User> userManager,
+            ILogger<AccountController> logger, IJwtFactory jwtFactory,
+            IOptions<JwtIssuerOptions> jwtOptions,
+            RoleManager<UserRole> roleManager,
+             SignInManager<User> signInManager) : base(logger)
         {
             _userService = userService;
             _userManager = userManager;
@@ -38,7 +43,7 @@ namespace Blog.WebApi.Controllers
             _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
             _roleManager = roleManager;
-
+            _signInManager = signInManager;
             _serializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented
@@ -104,6 +109,14 @@ namespace Blog.WebApi.Controllers
             };
 
             return new OkObjectResult(response);
+        }
+
+        [HttpPost("Logout", Name = "LogoutAsync")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
         }
 
         [HttpGet(Name = "GetUser")]

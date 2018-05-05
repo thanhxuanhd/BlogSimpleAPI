@@ -113,7 +113,7 @@ namespace Blog.WebApi.Auth
 
                 result = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 result = false;
             }

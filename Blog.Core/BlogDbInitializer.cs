@@ -56,7 +56,8 @@ namespace Blog.Core
                         CategoryName = $"Category {i}",
                         CagegoryDescription = $"Category {i}",
                         CreateOn = DateTime.Now,
-                        CreateBy = userId
+                        CreateBy = userId,
+                        IsPublic = true
                     };
 
                     postCategorys.Add(postCategory);
@@ -73,7 +74,8 @@ namespace Blog.Core
                         Content = "",
                         PostCategoryId = postCategorys.First().Id,
                         CreateOn = DateTime.Now,
-                        CreateBy = userId
+                        CreateBy = userId,
+                        IsPublic = true
                     };
 
                     posts.Add(post);

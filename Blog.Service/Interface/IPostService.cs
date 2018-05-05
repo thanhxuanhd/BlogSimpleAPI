@@ -7,11 +7,13 @@ namespace Blog.Service.Interface
 {
     public interface IPostService
     {
-        List<PostViewModel> Get(string keyword, bool desc = false, int pageIndex = 0, int pageSize = 15);
+        PagingViewModel<PostViewModel> Get(string keyword, string sortColumn, Guid? postCategoryId, bool desc = false, int pageIndex = 0, int pageSize = 15);
 
-        Guid Add(PostViewModel post);
+        Guid Add(PostViewModel post, Guid currentUserId);
 
-        void Update(PostViewModel post);
+        bool Update(PostViewModel post, Guid currentUserId);
+
+        bool Delete(Guid id, Guid currentUserId);
 
         PostViewModel GetById(Guid id);
 

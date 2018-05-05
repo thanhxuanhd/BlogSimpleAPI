@@ -5,6 +5,7 @@ using Blog.Core.Model;
 using Blog.Infrastructure;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,7 +57,11 @@ namespace Blog.Service.Service
             }
             var totalCount = query.Count();
 
-            var listpostCategorys = query.OrderBy(x => x.CategoryName).Skip(pageIndex * pageSize).Take(pageSize).ProjectTo<PostCategoryViewModel>().ToList();
+            var listpostCategorys = query.OrderBy(x => x.CategoryName)
+                                         .Skip(pageIndex * pageSize).Take(pageSize)
+                                         .AsNoTracking()
+                                         .ProjectTo<PostCategoryViewModel>()
+                                         .ToList();
             var pages = new PagingViewModel<PostCategoryViewModel>() {
                 PageIndex = pageIndex,
                 PageSize = pageSize,

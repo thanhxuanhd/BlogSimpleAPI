@@ -40,7 +40,9 @@ namespace Blog.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BlogDbContext>(options =>
-                     options.UseSqlServer(Configuration.GetConnectionString("BlogDbContext"), b => b.MigrationsAssembly("Blog.WebApi")))
+                     options.UseLazyLoadingProxies()
+                     .UseSqlServer(Configuration
+                     .GetConnectionString("BlogDbContext"), b => b.MigrationsAssembly("Blog.WebApi")))
                      .AddUnitOfWork<BlogDbContext>(); ;
 
             services.AddIdentity<User, UserRole>()
