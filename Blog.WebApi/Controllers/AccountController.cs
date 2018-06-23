@@ -105,7 +105,8 @@ namespace Blog.WebApi.Controllers
                 AuthenToken = token,
                 ExpiresIn = (int)_jwtOptions.ValidFor.TotalSeconds,
                 Roles = role.ToList(),
-                FullName = identity.Claims.Single(c => c.Type == "fullName").Value
+                FullName = identity.Claims.Single(c => c.Type == "fullName").Value,
+                Email = user.Email
             };
 
             return new OkObjectResult(response);

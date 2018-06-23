@@ -32,8 +32,8 @@ namespace Blog.Service.ViewModels
 
         public string MetaDescription { set; get; }
 
-        public virtual List<PostViewModel> Posts { get; set; }
+        public List<PostViewModel> Posts { get; set; }
 
-        public virtual List<PostCategoryViewModel> PostCategories { get; set; }
+        public List<PostCategoryViewModel> PostCategories { get; set; }
     }
 }
