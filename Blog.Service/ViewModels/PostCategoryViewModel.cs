@@ -20,7 +20,7 @@ namespace Blog.Service.ViewModels
         public string CategoryName { get; set; }
 
         [StringLength(5000)]
-        public string CagegoryDescription { get; set; }
+        public string CategoryDescription { get; set; }
 
         public bool IsPublic { get; set; }
 
