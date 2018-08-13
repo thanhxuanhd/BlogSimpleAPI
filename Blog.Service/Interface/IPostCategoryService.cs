@@ -19,5 +19,7 @@ namespace Blog.Service.Interface
         void Save();
 
         void UpdateParent(PostCategoryUpdateParentViewModel model, Guid currentUserId);
+
+        List<PostCategoryViewModel> GetAll();
     }
 }

@@ -62,7 +62,8 @@ namespace Blog.Service.Service
                                          .AsNoTracking()
                                          .ProjectTo<PostCategoryViewModel>()
                                          .ToList();
-            var pages = new PagingViewModel<PostCategoryViewModel>() {
+            var pages = new PagingViewModel<PostCategoryViewModel>()
+            {
                 PageIndex = pageIndex,
                 PageSize = pageSize,
                 Items = listpostCategorys,
@@ -71,9 +72,20 @@ namespace Blog.Service.Service
             return pages;
         }
 
+        public List<PostCategoryViewModel> GetAll()
+        {
+            var query = _postCategoryRepository.FindBy(x => !x.DeleteOn.HasValue)
+                                               .OrderBy(x => x.CategoryName)
+                                               .AsNoTracking()
+                                               .ProjectTo<PostCategoryViewModel>()
+                                               .ToList();
+            return query;
+
+        }
+
         public PostCategoryViewModel GetById(Guid id)
         {
-            var entity = _postCategoryRepository.AllIncluding(x => x.Posts, x=>x.PostCategories)
+            var entity = _postCategoryRepository.AllIncluding(x => x.Posts, x => x.PostCategories)
                 .Where(x => x.Id == id && !x.DeleteBy.HasValue).FirstOrDefault();
 
             if (entity == null)

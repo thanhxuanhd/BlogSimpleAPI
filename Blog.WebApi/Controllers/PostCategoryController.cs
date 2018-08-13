@@ -138,5 +138,15 @@ namespace Blog.WebApi.Controllers
                 return Ok();
             });
         }
+
+        [HttpGet("GetAll")]
+        public IActionResult GetAll()
+        {
+            return DoActionWithReturnResult(() =>
+            {
+                var listPostCategory = _postCategoryService.GetAll();
+                return ResponseDataSuccess(listPostCategory);
+            });
+        }
     }
 }
