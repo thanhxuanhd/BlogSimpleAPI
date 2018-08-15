@@ -17,7 +17,7 @@ namespace Blog.Core.Model
         [StringLength(50)]
         public string CategoryName { get; set; }
         [StringLength(5000)]
-        public string CagegoryDescription { get; set; }
+        public string CategoryDescription { get; set; }
         public bool IsPublic { get; set; }
         public Guid? ParentId { get; set; }
         public string Url { get; set; }

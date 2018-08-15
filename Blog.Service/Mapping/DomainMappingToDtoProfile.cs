@@ -12,7 +12,8 @@ namespace Blog.Service.Mapping
         public override string ProfileName => "DomainMappingToDtoProfile";
         public DomainMappingToDtoProfile()
         {
-            CreateMap<PostCategory, PostCategoryViewModel>();
+            CreateMap<PostCategory, PostCategoryViewModel>()
+                .ForMember(x => x.ParentPostCategory, opt => opt.MapFrom(dt => dt.ParentId));
             CreateMap<Post, PostViewModel>();
             CreateMap<Comment, CommentViewModel>();
             CreateMap<User, UserViewModel>();
@@ -21,7 +22,8 @@ namespace Blog.Service.Mapping
                 .ForMember(x => x.Id, opt => opt.MapFrom(dt => dt.Id))
                 .ForMember(x => x.Name, opt => opt.MapFrom(dt => dt.CategoryName));
             //
-            CreateMap<PostCategoryViewModel, PostCategory>();
+            CreateMap<PostCategoryViewModel, PostCategory>()
+                 .ForMember(x => x.ParentId, opt => opt.MapFrom(dt => dt.ParentPostCategory));
             CreateMap<PostViewModel, Post>();
             CreateMap<CommentViewModel, Comment>();
             CreateMap<UserViewModel, User>();

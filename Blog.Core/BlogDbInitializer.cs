@@ -54,7 +54,7 @@ namespace Blog.Core
                     {
                         Id = Guid.NewGuid(),
                         CategoryName = $"Category {i}",
-                        CagegoryDescription = $"Category {i}",
+                        CategoryDescription = $"Post Category {i} ",
                         CreateOn = DateTime.Now,
                         CreateBy = userId,
                         IsPublic = true
