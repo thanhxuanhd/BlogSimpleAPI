@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
 using System;
 
 namespace Blog.WebApi
@@ -15,6 +16,7 @@ namespace Blog.WebApi
         public static void Main(string[] args)
         {
             var host = BuildWebHost(args);
+
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -48,6 +50,8 @@ namespace Blog.WebApi
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .ConfigureLogging(logging =>logging.AddFilter("System", LogLevel.Debug)
+                .AddFilter<DebugLoggerProvider>("Microsoft", LogLevel.Trace))
                 .ConfigureAppConfiguration(SetupConfiguration)
                 .Build();
     }

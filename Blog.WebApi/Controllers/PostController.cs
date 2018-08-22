@@ -58,7 +58,7 @@ namespace Blog.WebApi.Controllers
                             .Select(x => new ValidationResponse()
                             {
                                 Key = x.Key,
-                                Errors = x.Value
+                                Validations = x.Value
                             });
                 return BadRequest(errors);
             }
@@ -80,7 +80,7 @@ namespace Blog.WebApi.Controllers
                             .Select(x => new ValidationResponse()
                             {
                                 Key = x.Key,
-                                Errors = x.Value
+                                Validations = x.Value
                             });
                 return BadRequest(errors);
             }

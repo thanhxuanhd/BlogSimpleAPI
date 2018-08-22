@@ -80,7 +80,7 @@ namespace Blog.WebApi.Controllers
                     new ValidationResponse()
                     {
                         Key = "UserName",
-                        Errors = new List<string>() { "USER_NOT_FOUND" }
+                        Validations = new List<string>() { "USER_NOT_FOUND" }
                     });
             }
             var identity = await GetClaimsIdentity(model.UserName, model.Password);
@@ -90,7 +90,7 @@ namespace Blog.WebApi.Controllers
                 return BadRequest(new ValidationResponse()
                 {
                     Key = "Password",
-                    Errors = new List<string>() { "PASSWORD_IS_CORECT" }
+                    Validations = new List<string>() { "PASSWORD_IS_CORECT" }
                 });
             }
 

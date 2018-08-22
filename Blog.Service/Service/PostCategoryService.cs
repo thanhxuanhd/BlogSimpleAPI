@@ -100,16 +100,16 @@ namespace Blog.Service.Service
             _unitOfWork.SaveChanges();
         }
 
-        public bool Update(PostCategoryViewModel post, Guid currentUserId)
+        public bool Update(PostCategoryViewModel postCategory, Guid currentUserId)
         {
-            var entity = _postCategoryRepository.FindBy(x => x.Id == post.Id && !x.DeleteBy.HasValue).FirstOrDefault();
+            var entity = _postCategoryRepository.FindBy(x => x.Id == postCategory.Id && !x.DeleteBy.HasValue).FirstOrDefault();
 
             if (entity == null)
             {
                 return false;
             }
 
-            var entityUpdate = Mapper.Map<PostCategoryViewModel, PostCategory>(post);
+            var entityUpdate = Mapper.Map<PostCategoryViewModel, PostCategory>(postCategory, entity);
             entity.ChangeBy = currentUserId;
             entity.ChangeOn = DateTime.UtcNow;
             _postCategoryRepository.Update(entityUpdate);

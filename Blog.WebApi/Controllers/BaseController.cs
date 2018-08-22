@@ -16,6 +16,7 @@ namespace Blog.WebApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class BaseController<T> : Controller
     {
         #region Properties
