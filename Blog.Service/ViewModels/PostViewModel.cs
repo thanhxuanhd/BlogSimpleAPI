@@ -9,7 +9,7 @@ namespace Blog.Service.ViewModels
         public Guid Id { get; set; }
 
         [StringLength(200)]
-        [Required]
+        [Required(ErrorMessage = "POST_TITLE_REQUIRED")]
         public string Title { get; set; }
 
         public string Content { get; set; }
@@ -18,6 +18,7 @@ namespace Blog.Service.ViewModels
         public Guid PostCategoryId { get; set; }
 
         public bool IsPublic { get; set; }
+        [MaxLength(2000)]
         public string Url { get; set; }
 
         public string MetaData { get; set; }

@@ -109,7 +109,7 @@ namespace Blog.Service.Service
                 return false;
             }
 
-            var entityUpdate = Mapper.Map<PostCategoryViewModel, PostCategory>(postCategory, entity);
+            var entityUpdate = Mapper.Map(postCategory, entity);
             entity.ChangeBy = currentUserId;
             entity.ChangeOn = DateTime.UtcNow;
             _postCategoryRepository.Update(entityUpdate);

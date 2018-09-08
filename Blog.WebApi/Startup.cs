@@ -1,34 +1,31 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity;
-using Blog.Core.Model;
+﻿using AutoMapper;
 using Blog.Core;
-using Microsoft.EntityFrameworkCore;
+using Blog.Core.Model;
+using Blog.Infrastructure;
 using Blog.Service.Interface;
 using Blog.Service.Service;
-using AutoMapper;
-using Newtonsoft.Json.Serialization;
-using Blog.Service.Mapping;
-using Blog.WebApi.Models;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using Blog.WebApi.Helpers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Blog.Core.Repository;
-using Blog.Core.Interface;
 using Blog.WebApi.Auth;
-using Blog.Infrastructure;
+using Blog.WebApi.Helpers;
+using Blog.WebApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
-using Blog.WebApi.Middleware;
+using System;
+using System.Text;
 
 namespace Blog.WebApi
 {
     public class Startup
     {
         private const string SecretKey = "ja1XBRwlCBB3Xm68YIAK2A788YNrDoP9"; // todo: get this from somewhere secure
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -82,7 +79,6 @@ namespace Blog.WebApi
 
         public void SetUpService(IServiceCollection services)
         {
-
             ///
             /// Config jwtOption Authen Service
             ///
@@ -116,7 +112,6 @@ namespace Blog.WebApi
                         options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-
                     }).AddJwtBearer(options =>
                     {
                         options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
@@ -124,7 +119,6 @@ namespace Blog.WebApi
                         options.TokenValidationParameters = tokenValidationParameters;
                         options.SaveToken = true;
                         options.IncludeErrorDetails = true;
-
                     }).AddCookie();
 
             //api user claim policy
@@ -144,6 +138,8 @@ namespace Blog.WebApi
 
             // Auto Mapper Config For Asp.Net Core
             services.AddAutoMapper();
+
+            Mapper.Initialize(sp => sp.AddConditionalObjectMapper());
             services.AddSingleton(Mapper.Configuration);
             services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
 
@@ -178,7 +174,6 @@ namespace Blog.WebApi
                         {
                             c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
                         });
-
         }
     }
 }

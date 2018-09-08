@@ -114,7 +114,7 @@ namespace Blog.Service.Service
                 return false;
             }
 
-            var entityUpdate = Mapper.Map<PostViewModel, Post>(post);
+            var entityUpdate = Mapper.Map(post, entity);
 
             _postRepository.Update(entityUpdate);
 
