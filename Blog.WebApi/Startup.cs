@@ -3,6 +3,7 @@ using Blog.Core;
 using Blog.Core.Model;
 using Blog.Infrastructure;
 using Blog.Service.Interface;
+using Blog.Service.Mapping;
 using Blog.Service.Service;
 using Blog.WebApi.Auth;
 using Blog.WebApi.Helpers;
@@ -80,7 +81,7 @@ namespace Blog.WebApi
         public void SetUpService(IServiceCollection services)
         {
             ///
-            /// Config jwtOption Authen Service
+            /// Config jwtOption Authentication Service
             ///
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
             SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtAppSettingOptions[nameof(JwtIssuerOptions.SecretKey)]));
@@ -121,7 +122,7 @@ namespace Blog.WebApi
                         options.IncludeErrorDetails = true;
                     }).AddCookie();
 
-            //api user claim policy
+            // API user claim policy
             services.AddAuthorization(options =>
                         {
                             options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
@@ -139,7 +140,9 @@ namespace Blog.WebApi
             // Auto Mapper Config For Asp.Net Core
             services.AddAutoMapper();
 
-            Mapper.Initialize(sp => sp.AddConditionalObjectMapper());
+            Mapper.Initialize(cf=> {
+                cf.AddProfile<DomainMappingToDtoProfile>();
+            });
             services.AddSingleton(Mapper.Configuration);
             services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
 
