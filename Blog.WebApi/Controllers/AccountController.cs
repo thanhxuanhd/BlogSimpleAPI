@@ -63,6 +63,7 @@ namespace Blog.WebApi.Controllers
             var userId = await _userManager.CreateAsync(user, model.Password);
             return Ok(userId);
         }
+
         [AllowAnonymous]
         [HttpPost("Login", Name = "Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
@@ -70,28 +71,42 @@ namespace Blog.WebApi.Controllers
             if (!ModelState.IsValid)
             {
                 _logger.LogError(ModelState.ToString());
-                return BadRequest(ModelState);
+                var errors = ModelState.ToDictionary(x => x.Key, x => x.Value.Errors.Select(e => e.ErrorMessage).ToList())
+                          .Select(x => new ValidationResponse()
+                          {
+                              Key = x.Key,
+                              Validations = x.Value
+                          });
+                return BadRequest(errors);
             }
 
             var user = await _userManager.FindByNameAsync(model.UserName);
             if (user == null)
             {
-                return BadRequest(
-                    new ValidationResponse()
+                var errors = new List<ValidationResponse>()
                     {
-                        Key = "UserName",
-                        Validations = new List<string>() { "USER_NOT_FOUND" }
-                    });
+                       new ValidationResponse
+                       {
+                           Key = "UserName",
+                           Validations = new List<string>() { "USER_NOT_FOUND" }
+                       }
+                    };
+                return BadRequest(errors);
+
             }
             var identity = await GetClaimsIdentity(model.UserName, model.Password);
 
             if (identity == null)
             {
-                return BadRequest(new ValidationResponse()
-                {
-                    Key = "Password",
-                    Validations = new List<string>() { "PASSWORD_IS_CORECT" }
-                });
+                var errors = new List<ValidationResponse>()
+                    {
+                        new ValidationResponse()
+                        {
+                            Key = "Password",
+                            Validations = new List<string>() { "PASSWORD_IN_CORRECT" }
+                        }
+                    };
+                return BadRequest(errors);
             }
 
             var role = await _userManager.GetRolesAsync(user);
@@ -141,7 +156,7 @@ namespace Blog.WebApi.Controllers
         {
             if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
             {
-                // get the user to verifty
+                // get the user to verify
                 var userToVerify = await _userManager.FindByNameAsync(userName);
 
                 if (userToVerify != null)
@@ -157,6 +172,5 @@ namespace Blog.WebApi.Controllers
             // Credentials are invalid, or account doesn't exist
             return await Task.FromResult<ClaimsIdentity>(null);
         }
-
     }
 }

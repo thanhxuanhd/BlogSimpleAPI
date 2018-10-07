@@ -38,7 +38,7 @@ namespace Blog.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BlogDbContext>(options =>
-                     options.UseLazyLoadingProxies()
+                     options
                      .UseSqlServer(Configuration
                      .GetConnectionString("BlogDbContext"), b => b.MigrationsAssembly("Blog.WebApi")))
                      .AddUnitOfWork<BlogDbContext>(); ;
@@ -70,7 +70,7 @@ namespace Blog.WebApi
 
             app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            // Enable middle ware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("../swagger/v1/swagger.json", "My API V1");

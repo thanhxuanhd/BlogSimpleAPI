@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Blog.Core.Model
 {
@@ -17,8 +15,8 @@ namespace Blog.Core.Model
         [MaxLength(50)]
         public Guid TagID { set; get; }
 
-        public virtual Post Post { set; get; }
+        public Post Post { set; get; }
 
-        public virtual Tag Tag { set; get; }
+        public Tag Tag { set; get; }
     }
 }

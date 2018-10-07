@@ -18,6 +18,6 @@ namespace Blog.Core.Model
         public string MetaData { get; set; }
         public string MetaDescription { set; get; }
 
-        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual IList<Comment> Comments { get; set; }
     }
 }

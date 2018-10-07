@@ -85,8 +85,8 @@ namespace Blog.Service.Service
 
         public PostCategoryViewModel GetById(Guid id)
         {
-            var entity = _postCategoryRepository.AllIncluding(x => x.Posts, x => x.PostCategories)
-                .Where(x => x.Id == id && !x.DeleteBy.HasValue).FirstOrDefault();
+            var entity = _postCategoryRepository.FindBy
+                (x => x.Id == id && !x.DeleteBy.HasValue).FirstOrDefault();
 
             if (entity == null)
             {
