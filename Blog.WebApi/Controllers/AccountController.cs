@@ -2,18 +2,12 @@
 using Blog.Core.Model;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
-using Blog.WebApi.Auth;
 using Blog.WebApi.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
@@ -27,21 +21,16 @@ namespace Blog.WebApi.Controllers
         private ILogger<AccountController> _logger;
         private SignInManager<User> _signInManager;
 
-        private readonly IJwtFactory _jwtFactory;
         private readonly JsonSerializerSettings _serializerSettings;
-        private readonly JwtIssuerOptions _jwtOptions;
 
         public AccountController(IUserService userService, UserManager<User> userManager,
-            ILogger<AccountController> logger, IJwtFactory jwtFactory,
-            IOptions<JwtIssuerOptions> jwtOptions,
+            ILogger<AccountController> logger,
             RoleManager<UserRole> roleManager,
-             SignInManager<User> signInManager) : base(logger)
+            SignInManager<User> signInManager) : base(logger)
         {
             _userService = userService;
             _userManager = userManager;
             _logger = logger;
-            _jwtFactory = jwtFactory;
-            _jwtOptions = jwtOptions.Value;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _serializerSettings = new JsonSerializerSettings
@@ -64,77 +53,6 @@ namespace Blog.WebApi.Controllers
             return Ok(userId);
         }
 
-        [AllowAnonymous]
-        [HttpPost("Login", Name = "Login")]
-        public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError(ModelState.ToString());
-                var errors = ModelState.ToDictionary(x => x.Key, x => x.Value.Errors.Select(e => e.ErrorMessage).ToList())
-                          .Select(x => new ValidationResponse()
-                          {
-                              Key = x.Key,
-                              Validations = x.Value
-                          });
-                return BadRequest(errors);
-            }
-
-            var user = await _userManager.FindByNameAsync(model.UserName);
-            if (user == null)
-            {
-                var errors = new List<ValidationResponse>()
-                    {
-                       new ValidationResponse
-                       {
-                           Key = "UserName",
-                           Validations = new List<string>() { "USER_NOT_FOUND" }
-                       }
-                    };
-                return BadRequest(errors);
-
-            }
-            var identity = await GetClaimsIdentity(model.UserName, model.Password);
-
-            if (identity == null)
-            {
-                var errors = new List<ValidationResponse>()
-                    {
-                        new ValidationResponse()
-                        {
-                            Key = "Password",
-                            Validations = new List<string>() { "PASSWORD_IN_CORRECT" }
-                        }
-                    };
-                return BadRequest(errors);
-            }
-
-            var role = await _userManager.GetRolesAsync(user);
-            identity.AddClaim(new Claim("fullName", user.FullName));
-            identity.AddClaim(new Claim("email", user.Email));
-            var token = await _jwtFactory.GenerateEncodedToken(model.UserName, identity);
-            // Serialize and return the response
-            var response = new AuthenResponseModel
-            {
-                Id = identity.Claims.Single(c => c.Type == "id").Value,
-                AuthenToken = token,
-                ExpiresIn = (int)_jwtOptions.ValidFor.TotalSeconds,
-                Roles = role.ToList(),
-                FullName = identity.Claims.Single(c => c.Type == "fullName").Value,
-                Email = user.Email
-            };
-
-            return new OkObjectResult(response);
-        }
-
-        [HttpPost("Logout", Name = "LogoutAsync")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LogoutAsync()
-        {
-            await _signInManager.SignOutAsync();
-            return Ok();
-        }
-
         [HttpGet(Name = "GetUser")]
         public IActionResult GetUser()
         {
@@ -150,27 +68,6 @@ namespace Blog.WebApi.Controllers
                var users = _userService.GetById(Id);
                return Json(users);
            });
-        }
-
-        private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)
-        {
-            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
-            {
-                // get the user to verify
-                var userToVerify = await _userManager.FindByNameAsync(userName);
-
-                if (userToVerify != null)
-                {
-                    // check the credentials
-                    if (await _userManager.CheckPasswordAsync(userToVerify, password))
-                    {
-                        return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id.ToString()));
-                    }
-                }
-            }
-
-            // Credentials are invalid, or account doesn't exist
-            return await Task.FromResult<ClaimsIdentity>(null);
         }
     }
 }

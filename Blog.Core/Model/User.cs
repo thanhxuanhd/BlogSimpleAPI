@@ -31,5 +31,7 @@ namespace Blog.Core.Model
 
         public virtual ICollection<IdentityRoleClaim<Guid>> AppRoleClaims { get; } = new List<IdentityRoleClaim<Guid>>();
 
+        public string RefreshTokenHash { get; set; }
+
     }
 }

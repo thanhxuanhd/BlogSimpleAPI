@@ -7,6 +7,7 @@ using Blog.Service.Mapping;
 using Blog.Service.Service;
 using Blog.WebApi.Auth;
 using Blog.WebApi.Helpers;
+using Blog.WebApi.Middleware;
 using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -59,7 +60,13 @@ namespace Blog.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
             }
+            else
+            {
+                app.UseHttpsEnforcement();
+            }
+
             //app.UseMiddleware<TokenRequestMiddleware>();
             app.UseStaticFiles();
             app.UseAuthentication();
@@ -134,13 +141,15 @@ namespace Blog.WebApi
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPostCategoryService, PostCategoryService>();
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<ITokenService, TokenService>();
             services.AddTransient<IJwtFactory, JwtFactory>();
             services.Configure<Configurations>(options => Configuration.GetSection(nameof(Configurations)).Bind(options));
 
             // Auto Mapper Config For Asp.Net Core
             services.AddAutoMapper();
 
-            Mapper.Initialize(cf=> {
+            Mapper.Initialize(cf =>
+            {
                 cf.AddProfile<DomainMappingToDtoProfile>();
             });
             services.AddSingleton(Mapper.Configuration);
