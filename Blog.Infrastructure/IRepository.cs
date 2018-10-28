@@ -263,5 +263,7 @@ namespace Blog.Infrastructure
         IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate);
 
         IQueryable<TEntity> AllIncluding(params Expression<Func<TEntity, object>>[] includeProperties);
+
+        IQueryable<TEntity> Query();
     }
 }

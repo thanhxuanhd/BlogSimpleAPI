@@ -1,22 +1,25 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Blog.Core.Extensions;
-using Blog.Core.Interface;
 using Blog.Core.Model;
 using Blog.Infrastructure;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Blog.Service.Service
 {
     public class UserService : IUserService
     {
         private IUnitOfWork _unitOfWork;
+
         //private IUserRepository _userRepository;
         private IRepository<User> _userRepository;
+
         private UserManager<User> _userMaganer;
 
         public UserService(UserManager<User> userMaganer, IUnitOfWork unitOfWork)
@@ -28,13 +31,12 @@ namespace Blog.Service.Service
             _userMaganer = userMaganer;
         }
 
-
         public Guid Add(UserViewModel user)
         {
             var entity = Mapper.Map<UserViewModel, User>(user);
             if (IsDuplicateUser(entity))
             {
-                throw new Exception("");
+                throw new BlogException("USER_DUPPLICATE");
             }
             entity.Id = Guid.NewGuid();
             _userMaganer.CreateAsync(entity);
@@ -43,19 +45,66 @@ namespace Blog.Service.Service
 
         public bool Delete(Guid userId)
         {
-            throw new NotImplementedException();
+            var entity = _userRepository
+                 .FindBy(x => x.Id == userId)
+                 .FirstOrDefault();
+            if (entity == null)
+            {
+                return false;
+            }
+
+            entity.IsActive = false;
+
+            _userRepository.Update(entity);
+
+            return true;
         }
 
-        public List<UserViewModel> GetList(int page, int pageSize, string keyWord = "", string sort = "", bool desc = false)
+        public PagingViewModel<UserViewModel> GetList(int page, int pageSize, string keyWord = "", string sort = "", bool desc = false)
         {
-            var query = _userRepository.GetPagedList().Items;
-            var users = Mapper.Map<List<User>, List<UserViewModel>>(query.ToList());
-            return users;
+            var query = _userRepository.FindBy(x => x.IsActive);
+
+            if (!string.IsNullOrEmpty(keyWord))
+            {
+                query = query.Where(x => x.UserName.Contains(keyWord));
+            }
+
+            query = desc ? query.OrderByDescending(x => x.UserName) : query.OrderBy(x => x.UserName);
+
+            var totalCount = query.Count();
+
+            var users = query.Skip(page * pageSize).Take(pageSize)
+                .ProjectTo<UserViewModel>().AsNoTracking().ToList();
+
+            var pages = new PagingViewModel<UserViewModel>()
+            {
+                PageIndex = page,
+                PageSize = pageSize,
+                Items = users,
+                TotalCount = totalCount
+            };
+
+            return pages;
         }
 
         public bool Update(UserViewModel user)
         {
-            throw new NotImplementedException();
+            var entity = _userRepository.AllIncluding(x => x.AppUserRoles)
+                .Where(x => x.Id == user.Id)
+                .FirstOrDefault();
+            if (entity == null)
+            {
+                return false;
+            }
+
+            entity.FullName = user.FullName;
+            entity.PhoneNumber = user.PhoneNumber;
+            entity.Sex = user.Sex;
+            entity.Email = user.Email;
+            entity.BirthDay = user.BirthDay;
+
+            _userRepository.Update(entity);
+            return true;
         }
 
         public UserWidthRoleViewModel GetById(Guid Id)
@@ -74,7 +123,6 @@ namespace Blog.Service.Service
                 Email = user.Email,
                 Id = user.Id
             };
-
         }
 
         private bool IsDuplicateUser(User user)
@@ -87,6 +135,16 @@ namespace Blog.Service.Service
             {
                 return _userRepository.FindBy(x => x.IsActive && x.UserName == user.UserName).Any();
             }
+        }
+
+        public void Save()
+        {
+            _unitOfWork.SaveChanges();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

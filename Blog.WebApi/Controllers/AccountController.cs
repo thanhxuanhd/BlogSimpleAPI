@@ -2,7 +2,6 @@
 using Blog.Core.Model;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
-using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -54,9 +53,9 @@ namespace Blog.WebApi.Controllers
         }
 
         [HttpGet(Name = "GetUser")]
-        public IActionResult GetUser()
+        public IActionResult GetUser(int page = 0, int pageSize = 15, string keyWord = "", string sort = "", bool desc = false)
         {
-            var users = _userService.GetList(0, 0);
+            var users = _userService.GetList(page, pageSize, keyWord, sort, desc);
             return Json(users);
         }
 
@@ -64,7 +63,7 @@ namespace Blog.WebApi.Controllers
         public IActionResult GetById(Guid Id)
         {
             return DoActionWithReturnResult(() =>
-           {
+            {
                var users = _userService.GetById(Id);
                return Json(users);
            });

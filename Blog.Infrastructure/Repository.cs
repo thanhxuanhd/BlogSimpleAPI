@@ -502,5 +502,10 @@ namespace Blog.Infrastructure
 
             return query;
         }
+
+        public IQueryable<TEntity> Query()
+        {
+            return _dbSet;
+        }
     }
 }

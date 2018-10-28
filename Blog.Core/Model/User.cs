@@ -15,21 +15,21 @@ namespace Blog.Core.Model
         /// <summary>
         /// Navigation property for the roles this user belongs to.
         /// </summary>
-        public virtual ICollection<IdentityUserRole<Guid>> AppUserRoles { get; } = new List<IdentityUserRole<Guid>>();
+        public IList<IdentityUserRole<Guid>> AppUserRoles { get; } = new List<IdentityUserRole<Guid>>();
 
         /// <summary>
         /// Navigation property for the claims this user possesses.
         /// </summary>
-        public virtual ICollection<IdentityUserClaim<Guid>> AppUserClaims { get; } = new List<IdentityUserClaim<Guid>>();
+        public IList<IdentityUserClaim<Guid>> AppUserClaims { get; } = new List<IdentityUserClaim<Guid>>();
 
         /// <summary>
         /// Navigation property for this users login accounts.
         /// </summary>
-        public virtual ICollection<IdentityUserLogin<Guid>> AppUserLogins { get; } = new List<IdentityUserLogin<Guid>>();
+        public IList<IdentityUserLogin<Guid>> AppUserLogins { get; } = new List<IdentityUserLogin<Guid>>();
 
-        public virtual ICollection<IdentityUserToken<Guid>> AppUserTokens { get; } = new List<IdentityUserToken<Guid>>();
+        public IList<IdentityUserToken<Guid>> AppUserTokens { get; } = new List<IdentityUserToken<Guid>>();
 
-        public virtual ICollection<IdentityRoleClaim<Guid>> AppRoleClaims { get; } = new List<IdentityRoleClaim<Guid>>();
+        public IList<IdentityRoleClaim<Guid>> AppRoleClaims { get; } = new List<IdentityRoleClaim<Guid>>();
 
         public string RefreshTokenHash { get; set; }
 
