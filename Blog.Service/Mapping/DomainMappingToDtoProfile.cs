@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
 using Blog.Core.Model;
 using Blog.Service.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Blog.Service.Mapping
 {
     public class DomainMappingToDtoProfile : Profile
     {
         public override string ProfileName => "DomainMappingToDtoProfile";
+
         public DomainMappingToDtoProfile()
         {
             CreateMap<PostCategory, PostCategoryViewModel>()
@@ -27,7 +25,8 @@ namespace Blog.Service.Mapping
             CreateMap<PostViewModel, Post>();
             CreateMap<CommentViewModel, Comment>();
             CreateMap<UserViewModel, User>();
+            CreateMap<RoleViewModel, UserRole>();
+            CreateMap<UserRole, RoleViewModel>();
         }
-
     }
 }

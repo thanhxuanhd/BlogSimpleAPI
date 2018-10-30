@@ -142,6 +142,7 @@ namespace Blog.WebApi
             services.AddScoped<IPostCategoryService, PostCategoryService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IRoleService, RoleService>();
             services.AddTransient<IJwtFactory, JwtFactory>();
             services.Configure<Configurations>(options => Configuration.GetSection(nameof(Configurations)).Bind(options));
 

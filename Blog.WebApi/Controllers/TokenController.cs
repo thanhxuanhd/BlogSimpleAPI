@@ -82,7 +82,7 @@ namespace Blog.WebApi.Controllers
                        new ValidationResponse
                        {
                            Key = "UserName",
-                           Validations = new List<string>() { "USER_NOT_FOUND" }
+                           Validations = new List<string>() { "USER_INVADLID" }
                        }
                     };
                 return BadRequest(errors);
