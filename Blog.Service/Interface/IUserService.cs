@@ -8,7 +8,7 @@ namespace Blog.Service.Interface
     {
         Guid Add(UserViewModel user);
 
-        bool Update(UserViewModel user);
+        bool Update(UserUpdateViewModel user);
 
         bool Delete(Guid userId);
 

@@ -22,42 +22,42 @@ using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class TokenController : BaseController<TokenController>
     {
-        private UserManager<User> _userManager;
-        private RoleManager<UserRole> _roleManager;
-        private ILogger<TokenController> _logger;
-        private SignInManager<User> _signInManager;
-        private readonly IJwtFactory _jwtFactory;
-        private readonly JsonSerializerSettings _serializerSettings;
+        #region Variables
+
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<UserRole> _roleManager;
+        private readonly ILogger<TokenController> _logger;
+        private readonly SignInManager<User> _signInManager;
         private readonly JwtIssuerOptions _jwtOptions;
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
 
+        #endregion
+
+        #region Constructor
+
         public TokenController(UserManager<User> userManager,
-          ILogger<TokenController> logger, IJwtFactory jwtFactory,
-          IOptions<JwtIssuerOptions> jwtOptions,
-          RoleManager<UserRole> roleManager,
-          SignInManager<User> signInManager,
-          IConfiguration configuration,
-          ITokenService tokenService) : base(logger)
+                              ILogger<TokenController> logger, IJwtFactory jwtFactory,
+                              IOptions<JwtIssuerOptions> jwtOptions,
+                              RoleManager<UserRole> roleManager,
+                              SignInManager<User> signInManager,
+                              IConfiguration configuration,
+                              ITokenService tokenService) : base(logger)
         {
             _userManager = userManager;
             _logger = logger;
-            _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
             _roleManager = roleManager;
             _signInManager = signInManager;
-            _serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
             _configuration = configuration;
             _tokenService = tokenService;
         }
 
+        #endregion
+
+        #region Action
         [AllowAnonymous]
         [HttpPost("Login", Name = "Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
@@ -162,6 +162,10 @@ namespace Blog.WebApi.Controllers
             return Ok();
         }
 
+        #endregion
+
+        #region Private Method
+
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -212,5 +216,7 @@ namespace Blog.WebApi.Controllers
 
             return claims;
         }
+
+        #endregion
     }
 }

@@ -7,20 +7,26 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Blog.WebApi.Controllers
 {
     public class PostCategoryController : BaseController<PostCategoryController>
     {
-        private ILogger<PostCategoryController> _logger;
+        #region Variables
+
         private readonly IPostCategoryService _postCategoryService;
+
+        #endregion
+
+        #region Constructor
 
         public PostCategoryController(ILogger<PostCategoryController> logger, IPostCategoryService postCategoryService) : base(logger)
         {
             _postCategoryService = postCategoryService;
-            _logger = logger;
         }
+
+        #endregion
+
+        #region Action
 
         // GET: api/values
         [HttpGet]
@@ -148,5 +154,8 @@ namespace Blog.WebApi.Controllers
                 return ResponseDataSuccess(listPostCategory);
             });
         }
+
+        #endregion
+
     }
 }

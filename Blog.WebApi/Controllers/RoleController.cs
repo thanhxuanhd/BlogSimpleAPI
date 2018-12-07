@@ -7,20 +7,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Blog.WebApi.Controllers
 {
     public class RoleController : BaseController<RoleController>
     {
-        private ILogger<RoleController> _logger;
+        #region Variables
+
         private readonly IRoleService _roleService;
+
+        #endregion
+
+        #region Contructor
 
         public RoleController(IRoleService roleService, ILogger<RoleController> logger) : base(logger)
         {
-            _logger = logger;
             _roleService = roleService;
         }
+
+        #endregion
+
+        #region Actions
 
         [HttpGet]
         public IActionResult Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15, bool desc = false)
@@ -107,11 +113,12 @@ namespace Blog.WebApi.Controllers
                 bool isDelete = _roleService.Delete(id);
                 if (isDelete)
                 {
-                    _logger.LogInformation($"User Delete {CurrentUserId}");
                     _roleService.Save();
                 }
                 return Json(isDelete);
             });
         }
+
+        #endregion
     }
 }

@@ -9,26 +9,25 @@ using Microsoft.Extensions.Logging;
 using Blog.Service.ViewModels;
 using Blog.WebApi.Models;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Blog.WebApi.Controllers
 {
     public class PostController : BaseController<PostController>
     {
         #region Variables
         private readonly IPostService _postService;
-        ILogger<PostController> _logger;
         #endregion
 
-        #region Ctor
+        #region Constructor
+
         public PostController(IPostService postService, ILogger<PostController> logger) : base(logger)
         {
             _postService = postService;
-            _logger = logger;
         }
+
         #endregion
 
         #region Action
+
         [HttpGet]
         public IActionResult Get(Guid? postCategoryId, string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15, bool desc = false)
         {
@@ -110,6 +109,7 @@ namespace Blog.WebApi.Controllers
                 return Json(isDelete);
             });
         }
+
         #endregion
     }
 }

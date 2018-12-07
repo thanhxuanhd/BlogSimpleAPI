@@ -87,11 +87,12 @@ namespace Blog.Service.Service
             return pages;
         }
 
-        public bool Update(UserViewModel user)
+        public bool Update(UserUpdateViewModel user)
         {
             var entity = _userRepository.AllIncluding(x => x.AppUserRoles)
                 .Where(x => x.Id == user.Id)
                 .FirstOrDefault();
+
             if (entity == null)
             {
                 return false;
@@ -100,7 +101,6 @@ namespace Blog.Service.Service
             entity.FullName = user.FullName;
             entity.PhoneNumber = user.PhoneNumber;
             entity.Sex = user.Sex;
-            entity.Email = user.Email;
             entity.BirthDay = user.BirthDay;
 
             _userRepository.Update(entity);

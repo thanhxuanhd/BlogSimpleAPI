@@ -10,13 +10,12 @@ using Blog.Core.Extensions;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Blog.WebApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
     [Produces("application/json")]
+    [ApiController]
     public class BaseController<T> : Controller
     {
         #region Properties

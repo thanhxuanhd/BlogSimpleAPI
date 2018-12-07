@@ -2,11 +2,13 @@
 using Blog.Core.Model;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
+using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
@@ -14,13 +16,12 @@ namespace Blog.WebApi.Controllers
     [Route("api/Account")]
     public class AccountController : BaseController<AccountController>
     {
-        private IUserService _userService;
-        private UserManager<User> _userManager;
-        private RoleManager<UserRole> _roleManager;
-        private ILogger<AccountController> _logger;
-        private SignInManager<User> _signInManager;
+        #region Variable
+        private readonly IUserService _userService;
+        private readonly UserManager<User> _userManager;
+        #endregion
 
-        private readonly JsonSerializerSettings _serializerSettings;
+        #region Contructor
 
         public AccountController(IUserService userService, UserManager<User> userManager,
             ILogger<AccountController> logger,
@@ -29,27 +30,51 @@ namespace Blog.WebApi.Controllers
         {
             _userService = userService;
             _userManager = userManager;
-            _logger = logger;
-            _roleManager = roleManager;
-            _signInManager = signInManager;
-            _serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
         }
+
+        #endregion
+
+        #region Action
 
         [HttpPost("Create", Name = "CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] UserViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogError(ModelState.ToString());
-                return BadRequest(ModelState);
+                var errors = ModelState.ToDictionary(x => x.Key, x => x.Value.Errors.Select(e => e.ErrorMessage).ToList())
+                           .Select(x => new ValidationResponse()
+                           {
+                               Key = x.Key,
+                               Validations = x.Value
+                           });
+                return BadRequest(errors);
             }
             var user = Mapper.Map<UserViewModel, User>(model);
             user.UserName = model.Email;
             var userId = await _userManager.CreateAsync(user, model.Password);
             return Ok(userId);
+        }
+
+        [HttpPut]
+        public IActionResult UpdateUser([FromBody] UserUpdateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var errors = ModelState.ToDictionary(x => x.Key, x => x.Value.Errors.Select(e => e.ErrorMessage).ToList())
+                          .Select(x => new ValidationResponse()
+                          {
+                              Key = x.Key,
+                              Validations = x.Value
+                          });
+                return BadRequest(errors);
+            }
+            var isUpdate = _userService.Update(model);
+
+            if (!isUpdate)
+            {
+                return BadRequest();
+            }
+            return Ok(isUpdate);
         }
 
         [HttpGet(Name = "GetUser")]
@@ -64,9 +89,11 @@ namespace Blog.WebApi.Controllers
         {
             return DoActionWithReturnResult(() =>
             {
-               var users = _userService.GetById(Id);
-               return Json(users);
-           });
+                var users = _userService.GetById(Id);
+                return Json(users);
+            });
         }
+
+        #endregion
     }
 }
