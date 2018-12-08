@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace Blog.WebApi.Controllers
 {
+    [ApiVersion("1.0")]
     public class PostCategoryController : BaseController<PostCategoryController>
     {
         #region Variables

@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
 {
+    [ApiVersion("1.0")]
     public class TokenController : BaseController<TokenController>
     {
         #region Variables

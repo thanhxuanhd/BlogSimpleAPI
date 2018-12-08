@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
 {
-    [Route("api/Account")]
+    [ApiVersion("1.0")]
     public class AccountController : BaseController<AccountController>
     {
         #region Variable

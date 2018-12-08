@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Blog.WebApi.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Produces("application/json")]
     [ApiController]
     public class BaseController<T> : Controller

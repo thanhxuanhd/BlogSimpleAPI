@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -180,8 +181,15 @@ namespace Blog.WebApi
             {
                 // Force Camel Case to JSON
                 opts.SerializerSettings.ContractResolver = new DefaultContractResolver();
-            }).AddViewLocalization()
-                .AddDataAnnotationsLocalization();
+            })
+            .AddViewLocalization()
+            .AddDataAnnotationsLocalization();
+
+            services.AddApiVersioning(o => {
+                o.ReportApiVersions = true;
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+            });
 
             services.AddSwaggerGen(c =>
                         {

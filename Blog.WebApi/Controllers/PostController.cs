@@ -11,6 +11,7 @@ using Blog.WebApi.Models;
 
 namespace Blog.WebApi.Controllers
 {
+    [ApiVersion("1.0")]
     public class PostController : BaseController<PostController>
     {
         #region Variables
