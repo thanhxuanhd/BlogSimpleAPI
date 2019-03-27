@@ -1,6 +1,6 @@
-﻿using Blog.Service.ViewModels;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Blog.Service.ViewModels;
 
 namespace Blog.Service.Interface
 {

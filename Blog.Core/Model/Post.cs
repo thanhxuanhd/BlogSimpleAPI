@@ -16,6 +16,7 @@ namespace Blog.Core.Model
         public string Url { get; set; }
 
         public string MetaData { get; set; }
+
         public string MetaDescription { set; get; }
 
         public virtual IList<Comment> Comments { get; set; }

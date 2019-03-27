@@ -1,8 +1,8 @@
-﻿using Blog.Core.Model;
+﻿using System;
+using Blog.Core.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace Blog.Core
 {

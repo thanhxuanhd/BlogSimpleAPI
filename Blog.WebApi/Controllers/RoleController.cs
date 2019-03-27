@@ -1,11 +1,11 @@
-﻿using Blog.Service.Interface;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Blog.Service.Interface;
 using Blog.Service.ViewModels;
 using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Blog.WebApi.Controllers
 {
@@ -16,7 +16,7 @@ namespace Blog.WebApi.Controllers
 
         private readonly IRoleService _roleService;
 
-        #endregion
+        #endregion Variables
 
         #region Contructor
 
@@ -25,7 +25,7 @@ namespace Blog.WebApi.Controllers
             _roleService = roleService;
         }
 
-        #endregion
+        #endregion Contructor
 
         #region Actions
 
@@ -120,6 +120,6 @@ namespace Blog.WebApi.Controllers
             });
         }
 
-        #endregion
+        #endregion Actions
     }
 }

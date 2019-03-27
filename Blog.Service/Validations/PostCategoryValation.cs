@@ -1,6 +1,6 @@
-﻿using Blog.Service.ViewModels;
+﻿using System;
+using Blog.Service.ViewModels;
 using FluentValidation;
-using System;
 
 namespace Blog.Service.Validations
 {

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Blog.Service.Interface;
-using Microsoft.Extensions.Logging;
 using Blog.Service.ViewModels;
 using Blog.WebApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Blog.WebApi.Controllers
 {
@@ -15,8 +12,10 @@ namespace Blog.WebApi.Controllers
     public class PostController : BaseController<PostController>
     {
         #region Variables
+
         private readonly IPostService _postService;
-        #endregion
+
+        #endregion Variables
 
         #region Constructor
 
@@ -25,7 +24,7 @@ namespace Blog.WebApi.Controllers
             _postService = postService;
         }
 
-        #endregion
+        #endregion Constructor
 
         #region Action
 
@@ -99,7 +98,6 @@ namespace Blog.WebApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-
             return DoActionWithReturnResult(() =>
             {
                 bool isDelete = _postService.Delete(id, CurrentUserId);
@@ -111,6 +109,6 @@ namespace Blog.WebApi.Controllers
             });
         }
 
-        #endregion
+        #endregion Action
     }
 }

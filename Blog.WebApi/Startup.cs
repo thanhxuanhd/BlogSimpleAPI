@@ -49,8 +49,6 @@ namespace Blog.WebApi
                     .AddEntityFrameworkStores<BlogDbContext>()
                     .AddDefaultTokenProviders();
 
-            services.AddScoped<IPostCategoryService, PostCategoryService>();
-
             SetUpService(services);
             services.AddMvc();
         }
@@ -73,7 +71,7 @@ namespace Blog.WebApi
             app.UseAuthentication();
             app.UseCors(option =>
             {
-                option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials();
+                option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
             });
 
             app.UseSwagger();
@@ -116,12 +114,13 @@ namespace Blog.WebApi
                 ValidateLifetime = false,
                 ClockSkew = TimeSpan.Zero
             };
-            services.AddAuthentication(options =>
-                    {
-                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    }).AddJwtBearer(options =>
+            services.AddAuthentication
+                (options =>
+                {
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddJwtBearer(options =>
                     {
                         options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
                         options.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
@@ -131,10 +130,12 @@ namespace Blog.WebApi
                     }).AddCookie();
 
             // API user claim policy
-            services.AddAuthorization(options =>
-                        {
-                            options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
-                        });
+            services.AddAuthorization
+                (
+                options =>
+                {
+                    options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
+                });
 
             //Repository
             //services.AddScoped<IUserRepository, UserRepository>();
@@ -185,16 +186,18 @@ namespace Blog.WebApi
             .AddViewLocalization()
             .AddDataAnnotationsLocalization();
 
-            services.AddApiVersioning(o => {
+            services.AddApiVersioning(o =>
+            {
                 o.ReportApiVersions = true;
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.DefaultApiVersion = new ApiVersion(1, 0);
             });
 
-            services.AddSwaggerGen(c =>
-                        {
-                            c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
-                        });
+            services.AddSwaggerGen(
+                c =>
+                {
+                    c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
+                });
         }
     }
 }

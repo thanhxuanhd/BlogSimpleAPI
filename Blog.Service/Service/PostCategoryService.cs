@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Blog.Core.Extensions;
 using Blog.Core.Model;
@@ -6,9 +9,6 @@ using Blog.Infrastructure;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Blog.Service.Service
 {
@@ -80,7 +80,6 @@ namespace Blog.Service.Service
                                                .ProjectTo<PostCategoryViewModel>()
                                                .ToList();
             return query;
-
         }
 
         public PostCategoryViewModel GetById(Guid id)

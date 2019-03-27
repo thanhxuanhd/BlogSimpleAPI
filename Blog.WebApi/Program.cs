@@ -1,4 +1,5 @@
-﻿using Blog.Core;
+﻿using System;
+using Blog.Core;
 using Blog.Core.Model;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
-using System;
 
 namespace Blog.WebApi
 {
@@ -50,7 +50,7 @@ namespace Blog.WebApi
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .ConfigureLogging(logging =>logging.AddFilter("System", LogLevel.Debug)
+                .ConfigureLogging(logging => logging.AddFilter("System", LogLevel.Debug)
                 .AddFilter<DebugLoggerProvider>("Microsoft", LogLevel.Trace))
                 .ConfigureAppConfiguration(SetupConfiguration)
                 .Build();

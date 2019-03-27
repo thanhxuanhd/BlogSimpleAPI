@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Blog.Core.Model;
 using Blog.Service.Interface;
 using Blog.Service.ViewModels;
@@ -6,10 +9,6 @@ using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Blog.WebApi.Controllers
 {
@@ -17,9 +16,11 @@ namespace Blog.WebApi.Controllers
     public class AccountController : BaseController<AccountController>
     {
         #region Variable
+
         private readonly IUserService _userService;
         private readonly UserManager<User> _userManager;
-        #endregion
+
+        #endregion Variable
 
         #region Contructor
 
@@ -32,7 +33,7 @@ namespace Blog.WebApi.Controllers
             _userManager = userManager;
         }
 
-        #endregion
+        #endregion Contructor
 
         #region Action
 
@@ -94,6 +95,6 @@ namespace Blog.WebApi.Controllers
             });
         }
 
-        #endregion
+        #endregion Action
     }
 }

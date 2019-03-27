@@ -1,11 +1,11 @@
-﻿using Blog.Service.Interface;
+﻿using System;
+using System.Linq;
+using Blog.Service.Interface;
 using Blog.Service.Validations;
 using Blog.Service.ViewModels;
 using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
 
 namespace Blog.WebApi.Controllers
 {
@@ -16,7 +16,7 @@ namespace Blog.WebApi.Controllers
 
         private readonly IPostCategoryService _postCategoryService;
 
-        #endregion
+        #endregion Variables
 
         #region Constructor
 
@@ -25,7 +25,7 @@ namespace Blog.WebApi.Controllers
             _postCategoryService = postCategoryService;
         }
 
-        #endregion
+        #endregion Constructor
 
         #region Action
 
@@ -156,7 +156,6 @@ namespace Blog.WebApi.Controllers
             });
         }
 
-        #endregion
-
+        #endregion Action
     }
 }

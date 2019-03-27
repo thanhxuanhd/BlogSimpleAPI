@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Blog.Infrastructure
 {
@@ -20,7 +17,7 @@ namespace Blog.Infrastructure
         public static IServiceCollection AddUnitOfWork<TContext>(this IServiceCollection services) where TContext : DbContext
         {
             services.AddScoped<IRepositoryFactory, UnitOfWork<TContext>>();
-            // Following has a issue: IUnitOfWork cannot support multiple dbcontext/database, 
+            // Following has a issue: IUnitOfWork cannot support multiple dbcontext/database,
             // that means cannot call AddUnitOfWork<TContext> multiple times.
             // Solution: check IUnitOfWork whether or null
             services.AddScoped<IUnitOfWork, UnitOfWork<TContext>>();

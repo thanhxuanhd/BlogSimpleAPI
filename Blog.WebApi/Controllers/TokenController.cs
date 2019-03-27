@@ -1,4 +1,12 @@
-﻿using Blog.Core.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using Blog.Core.Model;
 using Blog.WebApi.Auth;
 using Blog.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -8,15 +16,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -35,7 +34,7 @@ namespace Blog.WebApi.Controllers
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
 
-        #endregion
+        #endregion Variables
 
         #region Constructor
 
@@ -56,9 +55,10 @@ namespace Blog.WebApi.Controllers
             _tokenService = tokenService;
         }
 
-        #endregion
+        #endregion Constructor
 
         #region Action
+
         [AllowAnonymous]
         [HttpPost("Login", Name = "Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginViewModel model)
@@ -163,7 +163,7 @@ namespace Blog.WebApi.Controllers
             return Ok();
         }
 
-        #endregion
+        #endregion Action
 
         #region Private Method
 
@@ -218,6 +218,6 @@ namespace Blog.WebApi.Controllers
             return claims;
         }
 
-        #endregion
+        #endregion Private Method
     }
 }

@@ -19,7 +19,7 @@ namespace Blog.Service.Mapping
             CreateMap<PostCategory, SimpleSelectItem>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(dt => dt.Id))
                 .ForMember(x => x.Name, opt => opt.MapFrom(dt => dt.CategoryName));
-            //
+
             CreateMap<PostCategoryViewModel, PostCategory>()
                  .ForMember(x => x.ParentId, opt => opt.MapFrom(dt => dt.ParentPostCategory));
             CreateMap<PostViewModel, Post>();

@@ -1,12 +1,9 @@
 ﻿using Blog.Core.Model;
 using Blog.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Blog.Core.Interface
 {
-    public interface IUserRepository : IRepository<User> 
+    public interface IUserRepository : IRepository<User>
     {
     }
 }

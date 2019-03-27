@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
+using System.Security.Claims;
+using Blog.Core.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Security.Claims;
-using System.Net;
-using Blog.Core.Extensions;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.WebApi.Controllers
 {
@@ -19,6 +18,7 @@ namespace Blog.WebApi.Controllers
     public class BaseController<T> : Controller
     {
         #region Properties
+
         public ILogger<T> Logger
         {
             get; private set;
@@ -39,16 +39,20 @@ namespace Blog.WebApi.Controllers
                 return Guid.Empty;
             }
         }
-        #endregion
+
+        #endregion Properties
 
         #region Contructor
+
         public BaseController(ILogger<T> loggerFactory)
         {
             Logger = loggerFactory;
         }
-        #endregion
+
+        #endregion Contructor
 
         #region Protected-Methods
+
         protected virtual IActionResult DoActionWithReturnResult(Func<IActionResult> function)
         {
             IActionResult response = null;
@@ -80,7 +84,7 @@ namespace Blog.WebApi.Controllers
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc
             });
         }
-        #endregion
 
+        #endregion Protected-Methods
     }
 }
