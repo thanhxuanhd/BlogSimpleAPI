@@ -6,7 +6,6 @@ namespace Blog.Service.ViewModels
 {
     public class PostCategoryViewModel
     {
-
         public PostCategoryViewModel()
         {
             this.PostCategories = new List<PostCategoryViewModel>();

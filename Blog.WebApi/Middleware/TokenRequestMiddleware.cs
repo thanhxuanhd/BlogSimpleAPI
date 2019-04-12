@@ -1,25 +1,24 @@
-﻿using Blog.Core;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Blog.WebApi.Auth;
 using Blog.WebApi.Helpers;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Blog.WebApi.Middleware
 {
     public class TokenRequestMiddleware
     {
         #region Variables
+
         private readonly ILogger<TokenRequestMiddleware> _logger;
         private readonly RequestDelegate _next;
         private readonly Configurations _options;
         private readonly IJwtFactory _jwtFactory;
+
         #endregion Variables
 
         #region Ctor

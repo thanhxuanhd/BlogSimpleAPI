@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Text;
+using AutoMapper;
 using Blog.Core;
 using Blog.Core.Model;
 using Blog.Infrastructure;
@@ -20,8 +22,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.Text;
 
 namespace Blog.WebApi
 {

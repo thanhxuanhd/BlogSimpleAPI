@@ -18,6 +18,7 @@ namespace Blog.Service.ViewModels
         public Guid PostCategoryId { get; set; }
 
         public bool IsPublic { get; set; }
+
         [MaxLength(2000)]
         public string Url { get; set; }
 

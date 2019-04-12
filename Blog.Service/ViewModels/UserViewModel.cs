@@ -11,6 +11,7 @@ namespace Blog.Service.ViewModels
 
         [Required]
         public string Password { get; set; }
+
         [Required]
         public string RePassword { get; set; }
 

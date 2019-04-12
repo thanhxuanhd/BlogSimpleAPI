@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace Blog.Core.Model
 {
@@ -32,6 +31,5 @@ namespace Blog.Core.Model
         public IList<IdentityRoleClaim<Guid>> AppRoleClaims { get; } = new List<IdentityRoleClaim<Guid>>();
 
         public string RefreshTokenHash { get; set; }
-
     }
 }
