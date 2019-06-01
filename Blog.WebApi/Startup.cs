@@ -20,8 +20,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Blog.WebApi
 {
@@ -37,6 +37,7 @@ namespace Blog.WebApi
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        [Obsolete]
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BlogDbContext>(options =>
@@ -50,10 +51,11 @@ namespace Blog.WebApi
                     .AddDefaultTokenProviders();
 
             SetUpService(services);
-            services.AddMvc();
+            //services.AddMvc(option => option.EnableEndpointRouting = false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        [Obsolete]
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -68,7 +70,12 @@ namespace Blog.WebApi
 
             //app.UseMiddleware<TokenRequestMiddleware>();
             app.UseStaticFiles();
+
+            // Authorization
             app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseHttpsRedirection();
             app.UseCors(option =>
             {
                 option.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
@@ -81,9 +88,18 @@ namespace Blog.WebApi
             {
                 c.SwaggerEndpoint("../swagger/v1/swagger.json", "My API V1");
             });
-            app.UseMvc();
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
 
+        [Obsolete]
         public void SetUpService(IServiceCollection services)
         {
             ///
@@ -178,13 +194,15 @@ namespace Blog.WebApi
             });
 
             // Add framework services.
-            services.AddMvc().AddJsonOptions(opts =>
+            services.AddMvc().AddNewtonsoftJson(opts =>
             {
                 // Force Camel Case to JSON
                 opts.SerializerSettings.ContractResolver = new DefaultContractResolver();
             })
             .AddViewLocalization()
             .AddDataAnnotationsLocalization();
+
+            services.AddControllers();
 
             services.AddApiVersioning(o =>
             {
@@ -193,10 +211,9 @@ namespace Blog.WebApi
                 o.DefaultApiVersion = new ApiVersion(1, 0);
             });
 
-            services.AddSwaggerGen(
-                c =>
+            services.AddSwaggerGen(c =>
                 {
-                    c.SwaggerDoc("v1", new Info { Title = "Blog API", Version = "v1" });
+                    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
                 });
         }
     }

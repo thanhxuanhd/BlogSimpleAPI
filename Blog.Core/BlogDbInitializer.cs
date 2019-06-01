@@ -14,6 +14,7 @@ namespace Blog.Core
 
         public static void Initializer(BlogDbContext context, UserManager<User> userManager, RoleManager<UserRole> roleManager)
         {
+            context.Database.EnsureCreated();
             if (!(context.PostCategorys.Count() > 0))
             {
                 if (!roleManager.Roles.Any())

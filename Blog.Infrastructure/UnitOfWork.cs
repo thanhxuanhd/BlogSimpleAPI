@@ -89,6 +89,7 @@ namespace Blog.Infrastructure
         /// <param name="sql">The raw SQL.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns>The number of state entities written to database.</returns>
+        [Obsolete]
         public int ExecuteSqlCommand(string sql, params object[] parameters) => _context.Database.ExecuteSqlCommand(sql, parameters);
 
         /// <summary>
@@ -98,6 +99,7 @@ namespace Blog.Infrastructure
         /// <param name="sql">The raw SQL.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns>An <see cref="IQueryable{T}" /> that contains elements that satisfy the condition specified by raw SQL.</returns>
+        [Obsolete]
         public IQueryable<TEntity> FromSql<TEntity>(string sql, params object[] parameters) where TEntity : class => _context.Set<TEntity>().FromSql(sql, parameters);
 
         /// <summary>
