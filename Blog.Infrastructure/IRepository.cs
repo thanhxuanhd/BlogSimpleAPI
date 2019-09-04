@@ -13,15 +13,6 @@ namespace Blog.Infrastructure
     public interface IRepository<TEntity> where TEntity : class
     {
         /// <summary>
-        /// Changes the table name. This require the tables in the same database.
-        /// </summary>
-        /// <param name="table"></param>
-        /// <remarks>
-        /// This only been used for supporting multiple tables in the same model. This require the tables in the same database.
-        /// </remarks>
-        void ChangeTable(string table);
-
-        /// <summary>
         /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
         /// </summary>
         /// <param name="predicate">A function to test each element for a condition.</param>

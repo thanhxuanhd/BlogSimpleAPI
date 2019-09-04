@@ -165,14 +165,9 @@ namespace Blog.WebApi
             services.Configure<Configurations>(options => Configuration.GetSection(nameof(Configurations)).Bind(options));
 
             // Auto Mapper Config For Asp.Net Core
-            services.AddAutoMapper();
-
-            Mapper.Initialize(cf =>
-            {
-                cf.AddProfile<DomainMappingToDtoProfile>();
-            });
-            services.AddSingleton(Mapper.Configuration);
-            services.AddScoped<IMapper>(sp => new Mapper(sp.GetRequiredService<AutoMapper.IConfigurationProvider>(), sp.GetService));
+            IMapper mapper = AutoMapperConfig.RegisterMappings().CreateMapper();
+            services.AddSingleton(mapper);
+            //services.AddScoped<IMapper>(sp => new Mapper(mapper.ConfigurationProvider, sp.GetService));
 
             services.Configure<IdentityOptions>(options =>
             {

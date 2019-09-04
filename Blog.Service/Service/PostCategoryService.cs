@@ -16,16 +16,18 @@ namespace Blog.Service.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<PostCategory> _postCategoryRepository;
+        private readonly IMapper _mapper;
 
-        public PostCategoryService(IUnitOfWork unitOfWork)
+        public PostCategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _postCategoryRepository = unitOfWork.GetRepository<PostCategory>();
+            _mapper = mapper;
         }
 
         public Guid Add(PostCategoryViewModel post, Guid currentUserId)
         {
-            var entity = Mapper.Map<PostCategoryViewModel, PostCategory>(post);
+            var entity = _mapper.Map<PostCategoryViewModel, PostCategory>(post);
             entity.Id = Guid.NewGuid();
             entity.CreateBy = currentUserId;
             entity.CreateOn = DateTime.UtcNow;
@@ -60,7 +62,7 @@ namespace Blog.Service.Service
             var listpostCategorys = query.OrderBy(x => x.CategoryName)
                                          .Skip(pageIndex * pageSize).Take(pageSize)
                                          .AsNoTracking()
-                                         .ProjectTo<PostCategoryViewModel>()
+                                         .ProjectTo<PostCategoryViewModel>(_mapper.ConfigurationProvider)
                                          .ToList();
             var pages = new PagingViewModel<PostCategoryViewModel>()
             {
@@ -77,7 +79,7 @@ namespace Blog.Service.Service
             var query = _postCategoryRepository.FindBy(x => !x.DeleteOn.HasValue)
                                                .OrderBy(x => x.CategoryName)
                                                .AsNoTracking()
-                                               .ProjectTo<PostCategoryViewModel>()
+                                               .ProjectTo<PostCategoryViewModel>(_mapper.ConfigurationProvider)
                                                .ToList();
             return query;
         }
@@ -91,7 +93,7 @@ namespace Blog.Service.Service
             {
                 throw new BlogException("POST_CATEGORY_NOT_FOUND");
             }
-            return Mapper.Map<PostCategory, PostCategoryViewModel>(entity);
+            return _mapper.Map<PostCategory, PostCategoryViewModel>(entity);
         }
 
         public void Save()
@@ -108,7 +110,7 @@ namespace Blog.Service.Service
                 return false;
             }
 
-            var entityUpdate = Mapper.Map(postCategory, entity);
+            var entityUpdate = _mapper.Map(postCategory, entity);
             entity.ChangeBy = currentUserId;
             entity.ChangeOn = DateTime.UtcNow;
             _postCategoryRepository.Update(entityUpdate);

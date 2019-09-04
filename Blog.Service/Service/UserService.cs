@@ -21,19 +21,21 @@ namespace Blog.Service.Service
         private IRepository<User> _userRepository;
 
         private UserManager<User> _userMaganer;
+        private readonly IMapper _mapper;
 
-        public UserService(UserManager<User> userMaganer, IUnitOfWork unitOfWork)
+        public UserService(UserManager<User> userMaganer, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
 
             //_userRepository = userRepository;
             _userRepository = _unitOfWork.GetRepository<User>();
             _userMaganer = userMaganer;
+            _mapper = mapper;
         }
 
         public Guid Add(UserViewModel user)
         {
-            var entity = Mapper.Map<UserViewModel, User>(user);
+            var entity = _mapper.Map<UserViewModel, User>(user);
             if (IsDuplicateUser(entity))
             {
                 throw new BlogException("USER_DUPPLICATE");
@@ -73,8 +75,11 @@ namespace Blog.Service.Service
 
             var totalCount = query.Count();
 
-            var users = query.Skip(page * pageSize).Take(pageSize)
-                .ProjectTo<UserViewModel>().AsNoTracking().ToList();
+            var users = query.Skip(page * pageSize)
+                             .Take(pageSize)
+                             .ProjectTo<UserViewModel>(_mapper.ConfigurationProvider)
+                             .AsNoTracking()
+                             .ToList();
 
             var pages = new PagingViewModel<UserViewModel>()
             {

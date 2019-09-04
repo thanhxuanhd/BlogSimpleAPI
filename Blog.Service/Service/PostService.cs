@@ -16,16 +16,18 @@ namespace Blog.Service.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Post> _postRepository;
+        private readonly IMapper _mapper;
 
-        public PostService(IUnitOfWork unitOfWork)
+        public PostService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _postRepository = _unitOfWork.GetRepository<Post>();
+            _mapper = mapper;
         }
 
         public Guid Add(PostViewModel post, Guid currentUserId)
         {
-            var entity = Mapper.Map<PostViewModel, Post>(post);
+            var entity = _mapper.Map<PostViewModel, Post>(post);
 
             entity.Id = Guid.NewGuid();
             entity.CreateBy = currentUserId;
@@ -69,7 +71,9 @@ namespace Blog.Service.Service
 
             query = query.Skip(pageIndex * pageSize).Take(pageSize);
 
-            var listPost = query.ProjectTo<PostViewModel>().AsNoTracking().ToList();
+            var listPost = query.ProjectTo<PostViewModel>(_mapper.ConfigurationProvider)
+                                .AsNoTracking()
+                                .ToList();
             var pages = new PagingViewModel<PostViewModel>()
             {
                 PageIndex = pageIndex,
@@ -90,7 +94,7 @@ namespace Blog.Service.Service
                 throw new BlogException("POST_NOT_FOUND");
             }
 
-            return Mapper.Map<Post, PostViewModel>(post);
+            return _mapper.Map<Post, PostViewModel>(post);
         }
 
         public void Save()
@@ -113,7 +117,7 @@ namespace Blog.Service.Service
                 return false;
             }
 
-            var entityUpdate = Mapper.Map(post, entity);
+            var entityUpdate = _mapper.Map(post, entity);
 
             _postRepository.Update(entityUpdate);
 

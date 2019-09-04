@@ -19,6 +19,7 @@ namespace Blog.WebApi.Controllers
 
         private readonly IUserService _userService;
         private readonly UserManager<User> _userManager;
+        private readonly IMapper _mapper;
 
         #endregion Variable
 
@@ -26,11 +27,11 @@ namespace Blog.WebApi.Controllers
 
         public AccountController(IUserService userService, UserManager<User> userManager,
             ILogger<AccountController> logger,
-            RoleManager<UserRole> roleManager,
-            SignInManager<User> signInManager) : base(logger)
+            IMapper mapper) : base(logger)
         {
             _userService = userService;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         #endregion Contructor
@@ -50,7 +51,7 @@ namespace Blog.WebApi.Controllers
                            });
                 return BadRequest(errors);
             }
-            var user = Mapper.Map<UserViewModel, User>(model);
+            var user = _mapper.Map<UserViewModel, User>(model);
             user.UserName = model.Email;
             var userId = await _userManager.CreateAsync(user, model.Password);
             return Ok(userId);

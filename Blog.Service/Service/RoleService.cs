@@ -16,16 +16,18 @@ namespace Blog.Service.Service
     {
         private readonly IRepository<UserRole> _roleRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public RoleService(IUnitOfWork unitOfWork)
+        public RoleService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _roleRepository = unitOfWork.GetRepository<UserRole>();
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public Guid Add(RoleViewModel role)
         {
-            var entity = Mapper.Map<RoleViewModel, UserRole>(role);
+            var entity = _mapper.Map<RoleViewModel, UserRole>(role);
 
             if (IsDuplicateUser(entity))
             {
@@ -69,7 +71,7 @@ namespace Blog.Service.Service
                 throw new BlogException("POST_NOT_FOUND");
             }
 
-            return Mapper.Map<UserRole, RoleViewModel>(entity);
+            return _mapper.Map<UserRole, RoleViewModel>(entity);
         }
 
         public PagingViewModel<RoleViewModel> GetList(int page, int pageSize, string keyWord = "", string sort = "", bool desc = false)
@@ -85,7 +87,7 @@ namespace Blog.Service.Service
             query = desc ? query.OrderByDescending(x => x.Name) : query.OrderBy(x => x.Name);
 
             var roles = query.Skip(page * pageSize).Take(pageSize)
-                        .ProjectTo<RoleViewModel>()
+                        .ProjectTo<RoleViewModel>(_mapper.ConfigurationProvider)
                         .AsNoTracking()
                         .ToList();
 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Blog.Infrastructure.PagedList;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace Blog.Infrastructure
@@ -26,21 +25,6 @@ namespace Blog.Infrastructure
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _dbSet = _dbContext.Set<TEntity>();
-        }
-
-        /// <summary>
-        /// Changes the table name. This require the tables in the same database.
-        /// </summary>
-        /// <param name="table"></param>
-        /// <remarks>
-        /// This only been used for supporting multiple tables in the same model. This require the tables in the same database.
-        /// </remarks>
-        public void ChangeTable(string table)
-        {
-            if (_dbContext.Model.FindEntityType(typeof(TEntity)).Relational() is RelationalEntityTypeAnnotations relational)
-            {
-                relational.TableName = table;
-            }
         }
 
         /// <summary>
