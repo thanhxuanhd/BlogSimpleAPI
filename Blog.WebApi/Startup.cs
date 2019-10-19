@@ -73,7 +73,6 @@ namespace Blog.WebApi
 
             // Authorization
             app.UseAuthentication();
-            app.UseAuthorization();
 
             app.UseHttpsRedirection();
             app.UseCors(option =>
@@ -90,6 +89,8 @@ namespace Blog.WebApi
             });
 
             app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
