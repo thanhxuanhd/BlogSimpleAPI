@@ -56,7 +56,7 @@ namespace Blog.Infrastructure
         /// <param name="parameters">The parameters.</param>
         /// <returns>The number of state entities written to database.</returns>
         [Obsolete]
-        public int ExecuteSqlCommand(string sql, params object[] parameters) => _context.Database.ExecuteSqlCommand(sql, parameters);
+        public int ExecuteSqlCommand(string sql, params object[] parameters) => _context.Database.ExecuteSqlRaw(sql, parameters);
 
         /// <summary>
         /// Uses raw SQL queries to fetch the specified <typeparamref name="TEntity" /> data.
@@ -66,7 +66,7 @@ namespace Blog.Infrastructure
         /// <param name="parameters">The parameters.</param>
         /// <returns>An <see cref="IQueryable{T}" /> that contains elements that satisfy the condition specified by raw SQL.</returns>
         [Obsolete]
-        public IQueryable<TEntity> FromSql<TEntity>(string sql, params object[] parameters) where TEntity : class => _context.Set<TEntity>().FromSql(sql, parameters);
+        public IQueryable<TEntity> FromSql<TEntity>(string sql, params object[] parameters) where TEntity : class => _context.Set<TEntity>().FromSqlRaw(sql, parameters);
 
         /// <summary>
         /// Saves all changes made in this context to the database.
