@@ -1,0 +1,14 @@
+﻿@page "/logout"
+@inject ITokenSevice tokenServie
+@inject NavigationManager NavigationManager
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await tokenServie.Logout();
+        NavigationManager.NavigateTo("/");
+    }
+
+}
