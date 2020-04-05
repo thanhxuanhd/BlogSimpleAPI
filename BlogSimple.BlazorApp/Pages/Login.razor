@@ -1,0 +1,27 @@
+﻿@page "/Login"
+@inherits PageModels.LoginPage
+
+<div class="container login-page">
+    <div class="row">
+        <EditForm Model="LoginModel"  OnValidSubmit="HanderValiadSubmit" class="col-sm-8 m-auto">
+            @if (DisplayError)
+            {
+                <div class="text-danger">@ErrorMessage</div>
+            }
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="email">User Name</label>
+                <InputText id="email" class="form-control" @bind-Value="@LoginModel.UserName" placeholder="Enter username"></InputText>
+                <ValidationMessage For="@(() => LoginModel.UserName)" />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <InputText id="password" class="form-control" @bind-Value="@LoginModel.Password" type="password" placeholder="Enter password"></InputText>
+                <ValidationMessage For="@(() => LoginModel.Password)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary edit-btn">Login</button>
+        </EditForm>
+    </div>
+</div>
