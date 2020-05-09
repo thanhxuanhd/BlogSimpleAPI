@@ -1,0 +1,46 @@
+﻿@page "/PostCategoryAddEdit"
+@page "/PostCategoryAddEdit/{Id:guid}"
+
+@inherits PageModels.PostCategoryAddEditPage
+
+<div class="row">
+    <div class="col-md-12">
+        @if (Id.HasValue)
+        {
+            <h3>Edit Post Category</h3>
+        }
+        else
+        {
+            <h3>Add Post Category</h3>
+        }
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <EditForm Model="Model" OnValidSubmit="OnSaveChange" EditContext="editContext">
+                <div class="card-body">
+
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <label for="postCategoryName">Name</label>
+                        <InputText @bind-Value="Model.CategoryName" class="form-control" id="postCategoryName" placeholder="Please enter name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="postCategoryDescription">Description</label>
+                        <InputTextArea @bind-Value="Model.CategoryDescription" id="postCategoryDescription" class="form-control" placeholder="Please enter description" />
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="right">
+                        <button class="btn btn-primary" type="submit"><span class="oi oi-location" aria-hidden="true"></span> Save</button>
+                        <NavLink Match="NavLinkMatch.Prefix" href="/PostCategory" class="btn btn-default">
+                            Back
+                        </NavLink>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>

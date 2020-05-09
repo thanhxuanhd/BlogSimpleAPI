@@ -32,6 +32,8 @@ namespace BlogSimple.BlazorApp.Data.Services
             _authenticationStateProvider = authenticationStateProvider;
             _apiOptions = apiOptions.Value;
             _logger = logger;
+
+            httpClient.BaseAddress = new Uri(_apiOptions.Url);
         }
 
         public async Task<AuthenResponseModel> GetAccessToken(LoginViewModel model)
