@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using BlogSimple.BlazorApp.Data.Interfaces;
@@ -77,7 +77,6 @@ namespace BlogSimple.BlazorApp.Data.Services
             }
 
             return postCategory;
-
         }
 
         public async Task<bool> Edit(PostCategoryViewModel model)
@@ -89,6 +88,7 @@ namespace BlogSimple.BlazorApp.Data.Services
 
                 await PrepareHeader();
 
+                result = await _client.PutJsonAsync<bool>(url, model);
             }
             catch (Exception ex)
             {
@@ -96,7 +96,46 @@ namespace BlogSimple.BlazorApp.Data.Services
             }
 
             return result;
+        }
 
+        public async Task<Guid> Add(PostCategoryViewModel model)
+        {
+            Guid id = Guid.Empty;
+            try
+            {
+                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+
+                await PrepareHeader();
+
+                id = await _client.PostJsonAsync<Guid>(url, model);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex.Message);
+            }
+
+            return id;
+        }
+
+        public async Task<List<PostCategoryViewModel>> Get()
+        {
+            try
+            {
+                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+                url = $"{url}/GetAll";
+
+                await PrepareHeader();
+
+                var response = await _client.GetJsonAsync<List<PostCategoryViewModel>>(url);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+
+                return new List<PostCategoryViewModel>();
+            }
         }
 
         public async Task PrepareHeader()
