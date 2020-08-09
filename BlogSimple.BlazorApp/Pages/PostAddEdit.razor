@@ -1,0 +1,87 @@
+﻿@page "/PostAddEdit"
+@page "/PostAddEdit/{Id:guid}"
+
+@inherits PageModels.PostAddEditPage
+
+<div class="row">
+    <div class="col-md-12">
+        @if (Id.HasValue)
+        {
+            <h3>Edit Post </h3>
+        }
+        else
+        {
+            <h3>Add Post </h3>
+        }
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <EditForm Model="Model" OnValidSubmit="OnSaveChange" EditContext="editContext">
+                <div class="card-body">
+
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <input type="hidden" @bind="Model.Id" />
+
+                    <div class="form-group">
+                        <label for="postName">Title</label>
+                        <InputText @bind-Value="Model.Title" class="form-control" id="postName" placeholder="Please enter name" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postURL">Url</label>
+                        <InputText @bind-Value="Model.Url" id="postURL" class="form-control" placeholder="Please enter description" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postParent">Post Category</label>
+                        <select @bind="Model.PostCategoryId" id="postParent" class="form-control">
+                            <option value="">Please select Parent </option>
+                            @foreach (var item in PostCategories)
+                            {
+                                <option value="@item.Id">@item.CategoryName</option>
+                            }
+                        </select>
+                        <input @bind="Model.PostCategoryId" class="form-control" type="hidden" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postContent">Meta Description</label>
+                        <InputTextArea class="form-control" id="postContent" @bind-Value="Model.Content"></InputTextArea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="url">Url</label>
+                        <InputText type="text" class="form-control" id="url" @bind-Value="Model.Url" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="metaData">MetaData</label>
+                        <InputText type="text" class="form-control" id="metaData" @bind-Value="Model.MetaData" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="metaDescription">Meta Description</label>
+                        <InputTextArea class="form-control" id="metaDescription" @bind-Value="Model.MetaDescription"></InputTextArea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <InputCheckbox class="custom-control-input" name="IsPublic" id="isPublic" @bind-Value="Model.IsPublic" />
+                            <label class="custom-control-label" for="isPublic">Public</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="right">
+                        <button class="btn btn-primary" type="submit"><span class="oi oi-location" aria-hidden="true"></span> Save</button>
+                        <NavLink Match="NavLinkMatch.Prefix" href="/Posts" class="btn btn-default">
+                            Back
+                        </NavLink>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>

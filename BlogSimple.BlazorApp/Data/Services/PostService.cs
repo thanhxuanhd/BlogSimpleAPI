@@ -12,21 +12,21 @@ using Microsoft.Extensions.Options;
 
 namespace BlogSimple.BlazorApp.Data.Services
 {
-    public class PostCategoryService : IPostCategoryService
+    public class PostService : IPostService
     {
         private readonly HttpClient _client;
 
         private readonly APIConfiguration _apiOption;
 
-        private readonly ILogger<PostCategoryService> _logger;
+        private readonly ILogger<PostService> _logger;
 
         private readonly ILocalStorageService _localStorage;
 
-        private const string POST_CATEGORY_URL = "/api/{0}/PostCategory";
+        private const string POST_URL = "/api/{0}/Post";
 
-        public PostCategoryService(HttpClient client,
+        public PostService(HttpClient client,
                                    IOptions<APIConfiguration> apiOption,
-                                   ILogger<PostCategoryService> logger,
+                                   ILogger<PostService> logger,
                                    ILocalStorageService localStorage)
         {
             _client = client;
@@ -38,16 +38,16 @@ namespace BlogSimple.BlazorApp.Data.Services
             _client.BaseAddress = clientUrl;
         }
 
-        public async Task<PagingViewModel<PostCategoryViewModel>> Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15)
+        public async Task<PagingViewModel<PostViewModel>> Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15)
         {
             try
             {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+                string url = string.Format(POST_URL, _apiOption.Version);
                 url = $"{url}?keyWord={keyWord}&sortColunm={sortColunm}&pageIndex={pageIndex}&pageSize={pageSize}";
 
                 await PrepareHeader();
 
-                var response = await _client.GetJsonAsync<PagingViewModel<PostCategoryViewModel>>(url);
+                var response = await _client.GetJsonAsync<PagingViewModel<PostViewModel>>(url);
 
                 return response;
             }
@@ -55,36 +55,36 @@ namespace BlogSimple.BlazorApp.Data.Services
             {
                 _logger.LogError(ex.Message);
 
-                return new PagingViewModel<PostCategoryViewModel>();
+                return new PagingViewModel<PostViewModel>();
             }
         }
 
-        public async Task<PostCategoryViewModel> Get(Guid? id)
+        public async Task<PostViewModel> Get(Guid? id)
         {
-            PostCategoryViewModel postCategory = new PostCategoryViewModel();
+            PostViewModel post = new PostViewModel();
             try
             {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+                string url = string.Format(POST_URL, _apiOption.Version);
                 url = $"{url}/{id}";
 
                 await PrepareHeader();
 
-                postCategory = await _client.GetJsonAsync<PostCategoryViewModel>(url);
+                post = await _client.GetJsonAsync<PostViewModel>(url);
             }
             catch (Exception ex)
             {
                 this._logger.LogError(ex.Message);
             }
 
-            return postCategory;
+            return post;
         }
 
-        public async Task<bool> Edit(PostCategoryViewModel model)
+        public async Task<bool> Edit(PostViewModel model)
         {
             bool result = false;
             try
             {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+                string url = string.Format(POST_URL, _apiOption.Version);
 
                 await PrepareHeader();
 
@@ -98,12 +98,12 @@ namespace BlogSimple.BlazorApp.Data.Services
             return result;
         }
 
-        public async Task<Guid> Add(PostCategoryViewModel model)
+        public async Task<Guid> Add(PostViewModel model)
         {
             Guid id = Guid.Empty;
             try
             {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+                string url = string.Format(POST_URL, _apiOption.Version);
 
                 await PrepareHeader();
 
@@ -117,16 +117,16 @@ namespace BlogSimple.BlazorApp.Data.Services
             return id;
         }
 
-        public async Task<List<PostCategoryViewModel>> Get()
+        public async Task<List<PostViewModel>> Get()
         {
             try
             {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+                string url = string.Format(POST_URL, _apiOption.Version);
                 url = $"{url}/GetAll";
 
                 await PrepareHeader();
 
-                var response = await _client.GetJsonAsync<List<PostCategoryViewModel>>(url);
+                var response = await _client.GetJsonAsync<List<PostViewModel>>(url);
 
                 return response;
             }
@@ -134,7 +134,7 @@ namespace BlogSimple.BlazorApp.Data.Services
             {
                 _logger.LogError(ex.Message);
 
-                return new List<PostCategoryViewModel>();
+                return new List<PostViewModel>();
             }
         }
 

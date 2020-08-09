@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.LocalStorage" Version="2.1.5" />
+    <PackageReference Include="Blazored.LocalStorage" Version="2.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.2.0-preview3.20168.3" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.DataAnnotations.Validation" Version="3.1.0-preview4.19579.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="3.1.0-preview3.19555.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.0-preview.6.20323.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.0-preview.6.20312.15" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
 </Project>

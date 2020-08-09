@@ -1,5 +1,3 @@
-using System;
-using System.Net.Http;
 using Blazored.LocalStorage;
 using BlogSimple.BlazorApp.Data.Interfaces;
 using BlogSimple.BlazorApp.Data.Services;
@@ -7,11 +5,9 @@ using BlogSimple.BlazorApp.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace BlogSimple.BlazorApp
 {
@@ -33,32 +29,15 @@ namespace BlogSimple.BlazorApp
             services.AddAuthorizationCore();
             services.AddBlazoredLocalStorage();
 
-            // Add API configuration
             services.Configure<APIConfiguration>(Configuration.GetSection("APIConfiguration"));
 
-            // Add register HTTP Client
-            var apiUrl = new Uri(Configuration["APIConfiguration:Url"].ToString());
-
-
-            void RegisterTypedClient<TClient, TImplementation>(Uri apiBaseUrl)
-                where TClient : class where TImplementation : class, TClient
-            {
-                services.AddHttpClient<TClient, TImplementation>(client =>
-                {
-                    client.BaseAddress = apiBaseUrl;
-                });
-            }
-
+            services.AddHttpClient<ITokenSevice, TokenService>();
+            services.AddHttpClient<IPostCategoryService, PostCategoryService>();
 
             services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-
-            //RegisterTypedClient<AuthenticationStateProvider, ApiAuthenticationStateProvider>(apiUrl);
-            RegisterTypedClient<ITokenSevice, TokenService>(apiUrl);
-            RegisterTypedClient<IPostCategoryService, PostCategoryService>(apiUrl);
-
-            // Add register service
-            //services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-            //services.AddScoped<ITokenSevice, TokenService>();
+            services.AddScoped<ITokenSevice, TokenService>();
+            services.AddScoped<IPostCategoryService, PostCategoryService>();
+            services.AddScoped<IPostService, PostService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
