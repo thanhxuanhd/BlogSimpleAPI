@@ -29,8 +29,8 @@ jobs:
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
+            docker-compose --file docker-compose.tests.yml build
+            docker-compose --file docker-compose.tests.yml run sut
           else
             docker build . --file Dockerfile
           fi
