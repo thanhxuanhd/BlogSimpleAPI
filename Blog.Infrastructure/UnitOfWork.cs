@@ -125,11 +125,11 @@ namespace Blog.Infrastructure
 
                     return count;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     transaction.Rollback();
 
-                    throw ex;
+                    throw;
                 }
             }
         }

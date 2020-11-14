@@ -132,7 +132,7 @@ namespace Blog.Service.Service
 
         private bool IsDuplicateUser(User user)
         {
-            if (user.Id != null)
+            if (user.Id != Guid.Empty)
             {
                 return _userRepository.FindBy(x => x.IsActive && x.UserName == user.UserName && x.Id != user.Id).Any();
             }

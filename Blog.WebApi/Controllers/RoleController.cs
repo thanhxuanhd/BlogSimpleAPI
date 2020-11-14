@@ -74,7 +74,7 @@ namespace Blog.WebApi.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(Guid id, [FromBody] RoleViewModel model)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
                 var errors = new List<ValidationResponse>()
                 {

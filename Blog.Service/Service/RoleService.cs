@@ -134,7 +134,7 @@ namespace Blog.Service.Service
 
         private bool IsDuplicateUser(UserRole role)
         {
-            if (role.Id != null)
+            if (role.Id != Guid.Empty)
             {
                 return _roleRepository.FindBy(x => x.Name == role.Name).Any();
             }
