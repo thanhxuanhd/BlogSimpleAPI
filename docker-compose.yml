@@ -3,6 +3,10 @@ version: '3.4'
 services:
   sqldata:
     image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: mssql
+    hostname: mssql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - SA_PASSWORD=Pass@word
       - ACCEPT_EULA=Y
@@ -10,6 +14,9 @@ services:
       - "5433:1433"
   blog.webapi:
     image: ${DOCKER_REGISTRY-}blogwebapi
+    container_name: blog.webapi
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
@@ -23,6 +30,9 @@ services:
 
   blogsimple.blazorapp:
     image: ${DOCKER_REGISTRY-}blogsimpleblazorapp
+    container_name: blogsimple.blazorapp
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
