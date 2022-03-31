@@ -30,9 +30,9 @@ ConfigureServices();
 
 var app = builder.Build();
 
-SetupDatabase();
 Configure();
 
+SetupDatabase();
 app.Run();
 
 // This method gets called by the runtime. Use this method to add services to the container.

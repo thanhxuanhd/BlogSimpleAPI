@@ -1,0 +1,23 @@
+name: blogsimple
+services:
+  - name: mssql
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    env:
+      - name: SA_PASSWORD
+        value: Pass@word
+      - name: ACCEPT_EULA
+        value: "Y"
+    bindings:
+      - port: 1433
+  - name: blogapi
+    project: Blog.WebApi/Blog.WebApi.csproj
+    env_file:
+      - .env
+    bindings:
+      - port: 6102
+  - name: blogblazorApp
+    project: BlogSimple.BlazorApp/BlogSimple.BlazorApp.csproj
+    env_file:
+      - .env
+    bindings:
+      - port: 6103

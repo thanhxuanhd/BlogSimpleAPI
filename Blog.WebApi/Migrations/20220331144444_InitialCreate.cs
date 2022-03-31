@@ -1,11 +1,14 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
 
 namespace Blog.WebApi.Migrations
 {
-    public partial class InitBlog : Migration
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -13,10 +16,10 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    NormalizedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,24 +31,25 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false),
-                    BirthDay = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BirthDay = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefreshTokenHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Sex = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,12 +61,12 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Changed = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Kind = table.Column<int>(type: "int", nullable: false),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     RowId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    TableName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)
+                    TableName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Changed = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Kind = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,15 +78,15 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Alias = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -94,30 +98,28 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CagegoryDescription = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     CategoryName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CategoryDescription = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaData = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ParentPostCagegory = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PostCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PostCategorys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PostCategorys_PostCategorys_PostCategoryId",
-                        column: x => x.PostCategoryId,
+                        name: "FK_PostCategorys_PostCategorys_ParentId",
+                        column: x => x.ParentId,
                         principalTable: "PostCategorys",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -125,14 +127,14 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -144,10 +146,10 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -157,8 +159,7 @@ namespace Blog.WebApi.Migrations
                         name: "FK_AppRoleClaims_AppUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AppUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -166,10 +167,10 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -188,9 +189,9 @@ namespace Blog.WebApi.Migrations
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProviderKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,19 +201,25 @@ namespace Blog.WebApi.Migrations
                         column: x => x.UserId1,
                         principalTable: "AppUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AppUserRoles",
                 columns: table => new
                 {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserRoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AppUserRoles", x => new { x.RoleId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_AppUserRoles_AppRoles_UserRoleId",
+                        column: x => x.UserRoleId,
+                        principalTable: "AppRoles",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AppUserRoles_AppUsers_UserId",
                         column: x => x.UserId,
@@ -228,8 +235,8 @@ namespace Blog.WebApi.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -239,7 +246,7 @@ namespace Blog.WebApi.Migrations
                         column: x => x.UserId1,
                         principalTable: "AppUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -247,19 +254,19 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PostCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaData = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PostCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -277,15 +284,15 @@ namespace Blog.WebApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CreateOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeleteOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ChangeOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ChangeBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -294,8 +301,7 @@ namespace Blog.WebApi.Migrations
                         name: "FK_Comments_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -343,6 +349,11 @@ namespace Blog.WebApi.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AppUserRoles_UserRoleId",
+                table: "AppUserRoles",
+                column: "UserRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AppUserTokens_UserId1",
                 table: "AppUserTokens",
                 column: "UserId1");
@@ -353,9 +364,9 @@ namespace Blog.WebApi.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostCategorys_PostCategoryId",
+                name: "IX_PostCategorys_ParentId",
                 table: "PostCategorys",
-                column: "PostCategoryId");
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_PostCategoryId",
@@ -368,13 +379,11 @@ namespace Blog.WebApi.Migrations
                 column: "TagID");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "AppRoleClaims");
-
-            migrationBuilder.DropTable(
-                name: "AppRoles");
 
             migrationBuilder.DropTable(
                 name: "AppUserClaims");
@@ -399,6 +408,9 @@ namespace Blog.WebApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "PostTags");
+
+            migrationBuilder.DropTable(
+                name: "AppRoles");
 
             migrationBuilder.DropTable(
                 name: "AppUsers");
