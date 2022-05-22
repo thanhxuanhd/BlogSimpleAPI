@@ -1,162 +1,161 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using BlogSimple.BlazorApp.Data.Interfaces;
 using BlogSimple.BlazorApp.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
-namespace BlogSimple.BlazorApp.Data.Services
+namespace BlogSimple.BlazorApp.Data.Services;
+
+public class PostCategoryService : IPostCategoryService
 {
-    public class PostCategoryService : IPostCategoryService
+    private readonly HttpClient _client;
+
+    private readonly APIConfiguration _apiOption;
+
+    private readonly ILogger<PostCategoryService> _logger;
+
+    private readonly ILocalStorageService _localStorage;
+
+    private const string POST_CATEGORY_URL = "/api/{0}/PostCategory";
+
+    public PostCategoryService(HttpClient client,
+                               IOptions<APIConfiguration> apiOption,
+                               ILogger<PostCategoryService> logger,
+                               ILocalStorageService localStorage)
     {
-        private readonly HttpClient _client;
+        _client = client;
+        _apiOption = apiOption.Value;
+        _logger = logger;
+        _localStorage = localStorage;
 
-        private readonly APIConfiguration _apiOption;
+        Uri clientUrl = new Uri(_apiOption.Url);
+        _client.BaseAddress = clientUrl;
+    }
 
-        private readonly ILogger<PostCategoryService> _logger;
-
-        private readonly ILocalStorageService _localStorage;
-
-        private const string POST_CATEGORY_URL = "/api/{0}/PostCategory";
-
-        public PostCategoryService(HttpClient client,
-                                   IOptions<APIConfiguration> apiOption,
-                                   ILogger<PostCategoryService> logger,
-                                   ILocalStorageService localStorage)
+    public async Task<PagingViewModel<PostCategoryViewModel>> Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15)
+    {
+        try
         {
-            _client = client;
-            _apiOption = apiOption.Value;
-            _logger = logger;
-            _localStorage = localStorage;
+            string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+            url = $"{url}?keyWord={keyWord}&sortColunm={sortColunm}&pageIndex={pageIndex}&pageSize={pageSize}";
 
-            Uri clientUrl = new Uri(_apiOption.Url);
-            _client.BaseAddress = clientUrl;
+            await PrepareHeader();
+
+            var response = await _client.GetJsonAsync<PagingViewModel<PostCategoryViewModel>>(url);
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message);
+
+            return new PagingViewModel<PostCategoryViewModel>();
+        }
+    }
+
+    public async Task<PostCategoryViewModel> Get(Guid? id)
+    {
+        PostCategoryViewModel postCategory = new PostCategoryViewModel();
+        try
+        {
+            string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+            url = $"{url}/{id}";
+
+            await PrepareHeader();
+
+            postCategory = await _client.GetJsonAsync<PostCategoryViewModel>(url);
+        }
+        catch (Exception ex)
+        {
+            this._logger.LogError(ex.Message);
         }
 
-        public async Task<PagingViewModel<PostCategoryViewModel>> Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15)
+        return postCategory;
+    }
+
+    public async Task<bool> Edit(PostCategoryViewModel model)
+    {
+        bool result = false;
+        try
         {
-            try
-            {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
-                url = $"{url}?keyWord={keyWord}&sortColunm={sortColunm}&pageIndex={pageIndex}&pageSize={pageSize}";
+            string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
 
-                await PrepareHeader();
+            await PrepareHeader();
 
-                var response = await _client.GetJsonAsync<PagingViewModel<PostCategoryViewModel>>(url);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-
-                return new PagingViewModel<PostCategoryViewModel>();
-            }
+            result = await _client.PutJsonAsync<bool>(url, model);
+        }
+        catch (Exception ex)
+        {
+            this._logger.LogError(ex.Message);
         }
 
-        public async Task<PostCategoryViewModel> Get(Guid? id)
+        return result;
+    }
+
+    public async Task<Guid> Add(PostCategoryViewModel model)
+    {
+        Guid id = Guid.Empty;
+        try
         {
-            PostCategoryViewModel postCategory = new PostCategoryViewModel();
-            try
-            {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
-                url = $"{url}/{id}";
+            string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
 
-                await PrepareHeader();
+            await PrepareHeader();
 
-                postCategory = await _client.GetJsonAsync<PostCategoryViewModel>(url);
-            }
-            catch (Exception ex)
-            {
-                this._logger.LogError(ex.Message);
-            }
-
-            return postCategory;
+            id = await _client.PostJsonAsync<Guid>(url, model);
+        }
+        catch (Exception ex)
+        {
+            this._logger.LogError(ex.Message);
         }
 
-        public async Task<bool> Edit(PostCategoryViewModel model)
+        return id;
+    }
+
+    public async Task<List<PostCategoryViewModel>> Get()
+    {
+        try
         {
-            bool result = false;
-            try
-            {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+            string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+            url = $"{url}/GetAll";
 
-                await PrepareHeader();
+            await PrepareHeader();
 
-                result = await _client.PutJsonAsync<bool>(url, model);
-            }
-            catch (Exception ex)
-            {
-                this._logger.LogError(ex.Message);
-            }
+            var response = await _client.GetJsonAsync<List<PostCategoryViewModel>>(url);
 
-            return result;
+            return response;
         }
-
-        public async Task<Guid> Add(PostCategoryViewModel model)
+        catch (Exception ex)
         {
-            Guid id = Guid.Empty;
-            try
-            {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
+            _logger.LogError(ex.Message);
 
-                await PrepareHeader();
-
-                id = await _client.PostJsonAsync<Guid>(url, model);
-            }
-            catch (Exception ex)
-            {
-                this._logger.LogError(ex.Message);
-            }
-
-            return id;
+            return new List<PostCategoryViewModel>();
         }
+    }
 
-        public async Task<List<PostCategoryViewModel>> Get()
+    public async Task PrepareHeader()
+    {
+        try
         {
-            try
+            var savedToken = await _localStorage.GetItemAsync<string>("authToken");
+
+            if (!string.IsNullOrWhiteSpace(savedToken))
             {
-                string url = string.Format(POST_CATEGORY_URL, _apiOption.Version);
-                url = $"{url}/GetAll";
-
-                await PrepareHeader();
-
-                var response = await _client.GetJsonAsync<List<PostCategoryViewModel>>(url);
-
-                return response;
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex.Message);
-
-                return new List<PostCategoryViewModel>();
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", string.Empty);
             }
         }
-
-        public async Task PrepareHeader()
+        catch (Exception ex)
         {
-            try
-            {
-                var savedToken = await _localStorage.GetItemAsync<string>("authToken");
-
-                if (!string.IsNullOrWhiteSpace(savedToken))
-                {
-                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
-                }
-                else
-                {
-                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", string.Empty);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
+            _logger.LogError(ex.Message);
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Blog.Core.Model;
 using Blog.Infrastructure;
 
-namespace Blog.Core.Interface
+namespace Blog.Core.Interface;
+
+public interface IUserRepository : IRepository<User>
 {
-    public interface IUserRepository : IRepository<User>
-    {
-    }
 }

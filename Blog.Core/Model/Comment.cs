@@ -1,8 +1,7 @@
-﻿namespace Blog.Core.Model
+﻿namespace Blog.Core.Model;
+
+public class Comment : IEntityBase
 {
-    public class Comment : IEntityBase
-    {
-        public string Title { get; set; }
-        public string Content { get; set; }
-    }
+    public string Title { get; set; }
+    public string Content { get; set; }
 }

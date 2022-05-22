@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿namespace BlogSimple.BlazorApp.Models;
 
-namespace BlogSimple.BlazorApp.Models
+public class APIConfiguration
 {
-    public class APIConfiguration
-    {
-        public string Version { get; set; }
-        public string Url { get; set; }
-    }
+    public string Version { get; set; }
+    public string Url { get; set; }
 }

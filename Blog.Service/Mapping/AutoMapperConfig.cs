@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
 
-namespace Blog.Service.Mapping
+namespace Blog.Service.Mapping;
+
+public static class AutoMapperConfig
 {
-    public static class AutoMapperConfig
+    public static MapperConfiguration RegisterMappings()
     {
-        public static MapperConfiguration RegisterMappings()
+        return new MapperConfiguration(cfg =>
         {
-            return new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new DomainMappingToDtoProfile());
-            });
-        }
+            cfg.AddProfile(new DomainMappingToDtoProfile());
+        });
     }
 }

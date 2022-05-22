@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Blog.WebApi.Models
+namespace Blog.WebApi.Models;
+
+public class ValidationResponse
 {
-    public class ValidationResponse
-    {
-        public string Key { get; set; }
-        public List<string> Validations { get; set; }
-    }
+    public string Key { get; set; }
+    public List<string> Validations { get; set; }
 }

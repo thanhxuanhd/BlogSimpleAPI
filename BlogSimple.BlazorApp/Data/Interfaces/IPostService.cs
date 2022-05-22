@@ -1,20 +1,19 @@
-﻿using System;
+﻿using BlogSimple.BlazorApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BlogSimple.BlazorApp.Models;
 
-namespace BlogSimple.BlazorApp.Data.Interfaces
+namespace BlogSimple.BlazorApp.Data.Interfaces;
+
+public interface IPostService
 {
-    public interface IPostService
-    {
-        public Task<PagingViewModel<PostViewModel>> Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15);
+    public Task<PagingViewModel<PostViewModel>> Get(string keyWord = "", string sortColunm = "", int pageIndex = 0, int pageSize = 15);
 
-        public Task<List<PostViewModel>> Get();
+    public Task<List<PostViewModel>> Get();
 
-        public Task<PostViewModel> Get(Guid? id);
+    public Task<PostViewModel> Get(Guid? id);
 
-        public Task<bool> Edit(PostViewModel model);
+    public Task<bool> Edit(PostViewModel model);
 
-        public Task<Guid> Add(PostViewModel model);
-    }
+    public Task<Guid> Add(PostViewModel model);
 }

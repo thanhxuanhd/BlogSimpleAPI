@@ -1,6 +1,5 @@
-﻿namespace Blog.Service.ViewModels
+﻿namespace Blog.Service.ViewModels;
+
+public class Required
 {
-    internal class Required
-    {
-    }
 }

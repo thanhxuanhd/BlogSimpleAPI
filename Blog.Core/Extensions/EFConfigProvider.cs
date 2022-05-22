@@ -1,28 +1,27 @@
-﻿using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Linq;
 
-namespace Blog.Core.Extensions
+namespace Blog.Core.Extensions;
+
+public class EFConfigProvider : ConfigurationProvider
 {
-    public class EFConfigProvider : ConfigurationProvider
+    private Action<DbContextOptionsBuilder> OptionsAction { get; }
+
+    public EFConfigProvider(Action<DbContextOptionsBuilder> optionsAction)
     {
-        private Action<DbContextOptionsBuilder> OptionsAction { get; }
+        OptionsAction = optionsAction;
+    }
 
-        public EFConfigProvider(Action<DbContextOptionsBuilder> optionsAction)
+    public override void Load()
+    {
+        var builder = new DbContextOptionsBuilder<EFConfigurationDbContext>();
+        OptionsAction(builder);
+
+        using (var dbContext = new EFConfigurationDbContext(builder.Options))
         {
-            OptionsAction = optionsAction;
-        }
-
-        public override void Load()
-        {
-            var builder = new DbContextOptionsBuilder<EFConfigurationDbContext>();
-            OptionsAction(builder);
-
-            using (var dbContext = new EFConfigurationDbContext(builder.Options))
-            {
-                Data = dbContext.AppSettings.ToDictionary(c => c.Key, c => c.Value);
-            }
+            Data = dbContext.AppSettings.ToDictionary(c => c.Key, c => c.Value);
         }
     }
 }

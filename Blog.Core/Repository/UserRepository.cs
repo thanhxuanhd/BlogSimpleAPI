@@ -2,12 +2,11 @@
 using Blog.Core.Model;
 using Blog.Infrastructure;
 
-namespace Blog.Core.Repository
+namespace Blog.Core.Repository;
+
+public class UserRepository : Repository<User>, IUserRepository
 {
-    public class UserRepository : Repository<User>, IUserRepository
+    public UserRepository(BlogDbContext context) : base(context)
     {
-        public UserRepository(BlogDbContext context) : base(context)
-        {
-        }
     }
 }

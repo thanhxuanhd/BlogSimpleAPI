@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Blog.Core.Extensions;
 using Blog.Core.Model;
@@ -10,146 +7,148 @@ using Blog.Service.Interface;
 using Blog.Service.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Blog.Service.Service
+namespace Blog.Service.Service;
+
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private IUnitOfWork _unitOfWork;
+
+    //private IUserRepository _userRepository;
+    private IRepository<User> _userRepository;
+
+    private UserManager<User> _userMaganer;
+    private readonly IMapper _mapper;
+
+    public UserService(UserManager<User> userMaganer, IUnitOfWork unitOfWork, IMapper mapper)
     {
-        private IUnitOfWork _unitOfWork;
+        _unitOfWork = unitOfWork;
 
-        //private IUserRepository _userRepository;
-        private IRepository<User> _userRepository;
+        //_userRepository = userRepository;
+        _userRepository = _unitOfWork.GetRepository<User>();
+        _userMaganer = userMaganer;
+        _mapper = mapper;
+    }
 
-        private UserManager<User> _userMaganer;
-        private readonly IMapper _mapper;
-
-        public UserService(UserManager<User> userMaganer, IUnitOfWork unitOfWork, IMapper mapper)
+    public Guid Add(UserViewModel user)
+    {
+        var entity = _mapper.Map<UserViewModel, User>(user);
+        if (IsDuplicateUser(entity))
         {
-            _unitOfWork = unitOfWork;
+            throw new BlogException("USER_DUPPLICATE");
+        }
+        entity.Id = Guid.NewGuid();
+        _userMaganer.CreateAsync(entity);
+        return entity.Id;
+    }
 
-            //_userRepository = userRepository;
-            _userRepository = _unitOfWork.GetRepository<User>();
-            _userMaganer = userMaganer;
-            _mapper = mapper;
+    public bool Delete(Guid userId)
+    {
+        var entity = _userRepository
+             .FindBy(x => x.Id == userId)
+             .FirstOrDefault();
+        if (entity == null)
+        {
+            return false;
         }
 
-        public Guid Add(UserViewModel user)
+        entity.IsActive = false;
+
+        _userRepository.Update(entity);
+
+        return true;
+    }
+
+    public PagingViewModel<UserViewModel> GetList(int page, int pageSize, string keyWord = "", string sort = "", bool desc = false)
+    {
+        var query = _userRepository.FindBy(x => x.IsActive);
+
+        if (!string.IsNullOrEmpty(keyWord))
         {
-            var entity = _mapper.Map<UserViewModel, User>(user);
-            if (IsDuplicateUser(entity))
-            {
-                throw new BlogException("USER_DUPPLICATE");
-            }
-            entity.Id = Guid.NewGuid();
-            _userMaganer.CreateAsync(entity);
-            return entity.Id;
+            query = query.Where(x => x.UserName.Contains(keyWord));
         }
 
-        public bool Delete(Guid userId)
+        query = desc ? query.OrderByDescending(x => x.UserName) : query.OrderBy(x => x.UserName);
+
+        var totalCount = query.Count();
+
+        var users = query.Skip(page * pageSize)
+                         .Take(pageSize)
+                         .ProjectTo<UserViewModel>(_mapper.ConfigurationProvider)
+                         .AsNoTracking()
+                         .ToList();
+
+        var pages = new PagingViewModel<UserViewModel>()
         {
-            var entity = _userRepository
-                 .FindBy(x => x.Id == userId)
-                 .FirstOrDefault();
-            if (entity == null)
-            {
-                return false;
-            }
+            PageIndex = page,
+            PageSize = pageSize,
+            Items = users,
+            TotalCount = totalCount
+        };
 
-            entity.IsActive = false;
+        return pages;
+    }
 
-            _userRepository.Update(entity);
+    public bool Update(UserUpdateViewModel user)
+    {
+        var entity = _userRepository.AllIncluding(x => x.AppUserRoles)
+            .Where(x => x.Id == user.Id)
+            .FirstOrDefault();
 
-            return true;
+        if (entity == null)
+        {
+            return false;
         }
 
-        public PagingViewModel<UserViewModel> GetList(int page, int pageSize, string keyWord = "", string sort = "", bool desc = false)
+        entity.FullName = user.FullName;
+        entity.PhoneNumber = user.PhoneNumber;
+        entity.Sex = user.Sex;
+        entity.BirthDay = user.BirthDay;
+
+        _userRepository.Update(entity);
+        return true;
+    }
+
+    public UserWidthRoleViewModel GetById(Guid Id)
+    {
+        var user = _userMaganer.FindByIdAsync(Id.ToString()).Result;
+        if (user == null)
         {
-            var query = _userRepository.FindBy(x => x.IsActive);
-
-            if (!string.IsNullOrEmpty(keyWord))
-            {
-                query = query.Where(x => x.UserName.Contains(keyWord));
-            }
-
-            query = desc ? query.OrderByDescending(x => x.UserName) : query.OrderBy(x => x.UserName);
-
-            var totalCount = query.Count();
-
-            var users = query.Skip(page * pageSize)
-                             .Take(pageSize)
-                             .ProjectTo<UserViewModel>(_mapper.ConfigurationProvider)
-                             .AsNoTracking()
-                             .ToList();
-
-            var pages = new PagingViewModel<UserViewModel>()
-            {
-                PageIndex = page,
-                PageSize = pageSize,
-                Items = users,
-                TotalCount = totalCount
-            };
-
-            return pages;
+            throw new BlogException("UserNotFound");
         }
-
-        public bool Update(UserUpdateViewModel user)
+        var roles = _userMaganer.GetRolesAsync(user).Result;
+        return new UserWidthRoleViewModel()
         {
-            var entity = _userRepository.AllIncluding(x => x.AppUserRoles)
-                .Where(x => x.Id == user.Id)
-                .FirstOrDefault();
+            BirthDay = user.BirthDay,
+            FullName = user.FullName,
+            Roles = roles.ToList(),
+            Email = user.Email,
+            Id = user.Id
+        };
+    }
 
-            if (entity == null)
-            {
-                return false;
-            }
-
-            entity.FullName = user.FullName;
-            entity.PhoneNumber = user.PhoneNumber;
-            entity.Sex = user.Sex;
-            entity.BirthDay = user.BirthDay;
-
-            _userRepository.Update(entity);
-            return true;
-        }
-
-        public UserWidthRoleViewModel GetById(Guid Id)
+    private bool IsDuplicateUser(User user)
+    {
+        if (user.Id != Guid.Empty)
         {
-            var user = _userMaganer.FindByIdAsync(Id.ToString()).Result;
-            if (user == null)
-            {
-                throw new BlogException("UserNotFound");
-            }
-            var roles = _userMaganer.GetRolesAsync(user).Result;
-            return new UserWidthRoleViewModel()
-            {
-                BirthDay = user.BirthDay,
-                FullName = user.FullName,
-                Roles = roles.ToList(),
-                Email = user.Email,
-                Id = user.Id
-            };
+            return _userRepository.FindBy(x => x.IsActive && x.UserName == user.UserName && x.Id != user.Id).Any();
         }
-
-        private bool IsDuplicateUser(User user)
+        else
         {
-            if (user.Id != Guid.Empty)
-            {
-                return _userRepository.FindBy(x => x.IsActive && x.UserName == user.UserName && x.Id != user.Id).Any();
-            }
-            else
-            {
-                return _userRepository.FindBy(x => x.IsActive && x.UserName == user.UserName).Any();
-            }
+            return _userRepository.FindBy(x => x.IsActive && x.UserName == user.UserName).Any();
         }
+    }
 
-        public void Save()
-        {
-            _unitOfWork.SaveChanges();
-        }
+    public void Save()
+    {
+        _unitOfWork.SaveChanges();
+    }
 
-        public async Task SaveChangesAsync()
-        {
-            await _unitOfWork.SaveChangesAsync();
-        }
+    public async Task SaveChangesAsync()
+    {
+        await _unitOfWork.SaveChangesAsync();
     }
 }

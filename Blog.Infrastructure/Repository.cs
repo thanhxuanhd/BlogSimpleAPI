@@ -1,496 +1,495 @@
-﻿using System;
+﻿using Blog.Infrastructure.PagedList;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Blog.Infrastructure.PagedList;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Query;
 
-namespace Blog.Infrastructure
+namespace Blog.Infrastructure;
+
+public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    protected readonly DbContext _dbContext;
+    protected readonly DbSet<TEntity> _dbSet;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Repository{TEntity}"/> class.
+    /// </summary>
+    /// <param name="dbContext">The database context.</param>
+    public Repository(DbContext dbContext)
     {
-        protected readonly DbContext _dbContext;
-        protected readonly DbSet<TEntity> _dbSet;
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        _dbSet = _dbContext.Set<TEntity>();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Repository{TEntity}"/> class.
-        /// </summary>
-        /// <param name="dbContext">The database context.</param>
-        public Repository(DbContext dbContext)
+    /// <summary>
+    /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+    /// </summary>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order elements.</param>
+    /// <param name="include">A function to include navigation properties</param>
+    /// <param name="pageIndex">The index of page.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+    /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+    /// <remarks>This method default no-tracking query.</remarks>
+    public IPagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> predicate = null,
+                                            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+                                            int pageIndex = 0,
+                                            int pageSize = 20,
+                                            bool disableTracking = true)
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (disableTracking)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _dbSet = _dbContext.Set<TEntity>();
+            query = query.AsNoTracking();
         }
 
-        /// <summary>
-        /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
-        /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public IPagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> predicate = null,
-                                                Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                int pageIndex = 0,
-                                                int pageSize = 20,
-                                                bool disableTracking = true)
+        if (include != null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
-
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).ToPagedList(pageIndex, pageSize);
-            }
-            else
-            {
-                return query.ToPagedList(pageIndex, pageSize);
-            }
+            query = include(query);
         }
 
-        /// <summary>
-        /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
-        /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="cancellationToken">
-        ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
-        /// </param>
-        /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public Task<IPagedList<TEntity>> GetPagedListAsync(Expression<Func<TEntity, bool>> predicate = null,
-                                                           Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                           Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                           int pageIndex = 0,
-                                                           int pageSize = 20,
-                                                           bool disableTracking = true,
-                                                           CancellationToken cancellationToken = default(CancellationToken))
+        if (predicate != null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
-
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
-            }
-            else
-            {
-                return query.ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
-            }
+            query = query.Where(predicate);
         }
 
-        /// <summary>
-        /// Gets the <see cref="IPagedList{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
-        /// </summary>
-        /// <param name="selector">The selector for projection.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <returns>An <see cref="IPagedList{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public IPagedList<TResult> GetPagedList<TResult>(Expression<Func<TEntity, TResult>> selector,
-                                                         Expression<Func<TEntity, bool>> predicate = null,
-                                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                         int pageIndex = 0,
-                                                         int pageSize = 20,
-                                                         bool disableTracking = true)
-            where TResult : class
+        if (orderBy != null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
+            return orderBy(query).ToPagedList(pageIndex, pageSize);
+        }
+        else
+        {
+            return query.ToPagedList(pageIndex, pageSize);
+        }
+    }
 
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).Select(selector).ToPagedList(pageIndex, pageSize);
-            }
-            else
-            {
-                return query.Select(selector).ToPagedList(pageIndex, pageSize);
-            }
+    /// <summary>
+    /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+    /// </summary>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order elements.</param>
+    /// <param name="include">A function to include navigation properties</param>
+    /// <param name="pageIndex">The index of page.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+    /// <param name="cancellationToken">
+    ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
+    /// </param>
+    /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+    /// <remarks>This method default no-tracking query.</remarks>
+    public Task<IPagedList<TEntity>> GetPagedListAsync(Expression<Func<TEntity, bool>> predicate = null,
+                                                       Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                                       Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+                                                       int pageIndex = 0,
+                                                       int pageSize = 20,
+                                                       bool disableTracking = true,
+                                                       CancellationToken cancellationToken = default(CancellationToken))
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (disableTracking)
+        {
+            query = query.AsNoTracking();
         }
 
-        /// <summary>
-        /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
-        /// </summary>
-        /// <param name="selector">The selector for projection.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="pageIndex">The index of page.</param>
-        /// <param name="pageSize">The size of the page.</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <param name="cancellationToken">
-        ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
-        /// </param>
-        /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public Task<IPagedList<TResult>> GetPagedListAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
-                                                                    Expression<Func<TEntity, bool>> predicate = null,
-                                                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                                    int pageIndex = 0,
-                                                                    int pageSize = 20,
-                                                                    bool disableTracking = true,
-                                                                    CancellationToken cancellationToken = default(CancellationToken))
-            where TResult : class
+        if (include != null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
-
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).Select(selector).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
-            }
-            else
-            {
-                return query.Select(selector).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
-            }
+            query = include(query);
         }
 
-        /// <summary>
-        /// Gets the first or default entity based on a predicate, orderby delegate and include delegate. This method default no-tracking query.
-        /// </summary>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public TEntity GetFirstOrDefault(Expression<Func<TEntity, bool>> predicate = null,
-                                         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                         bool disableTracking = true)
+        if (predicate != null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
-
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).FirstOrDefault();
-            }
-            else
-            {
-                return query.FirstOrDefault();
-            }
+            query = query.Where(predicate);
         }
 
-        /// <summary>
-        /// Gets the first or default entity based on a predicate, orderby delegate and include delegate. This method default no-tracking query.
-        /// </summary>
-        /// <param name="selector">The selector for projection.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="orderBy">A function to order elements.</param>
-        /// <param name="include">A function to include navigation properties</param>
-        /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
-        /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
-        /// <remarks>This method default no-tracking query.</remarks>
-        public TResult GetFirstOrDefault<TResult>(Expression<Func<TEntity, TResult>> selector,
-                                                  Expression<Func<TEntity, bool>> predicate = null,
-                                                  Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-                                                  Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-                                                  bool disableTracking = true)
+        if (orderBy != null)
         {
-            IQueryable<TEntity> query = _dbSet;
-            if (disableTracking)
-            {
-                query = query.AsNoTracking();
-            }
+            return orderBy(query).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+        }
+        else
+        {
+            return query.ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+        }
+    }
 
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).Select(selector).FirstOrDefault();
-            }
-            else
-            {
-                return query.Select(selector).FirstOrDefault();
-            }
+    /// <summary>
+    /// Gets the <see cref="IPagedList{TResult}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+    /// </summary>
+    /// <param name="selector">The selector for projection.</param>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order elements.</param>
+    /// <param name="include">A function to include navigation properties</param>
+    /// <param name="pageIndex">The index of page.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+    /// <returns>An <see cref="IPagedList{TResult}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+    /// <remarks>This method default no-tracking query.</remarks>
+    public IPagedList<TResult> GetPagedList<TResult>(Expression<Func<TEntity, TResult>> selector,
+                                                     Expression<Func<TEntity, bool>> predicate = null,
+                                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+                                                     int pageIndex = 0,
+                                                     int pageSize = 20,
+                                                     bool disableTracking = true)
+        where TResult : class
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (disableTracking)
+        {
+            query = query.AsNoTracking();
         }
 
-        /// <summary>
-        /// Uses raw SQL queries to fetch the specified <typeparamref name="TEntity" /> data.
-        /// </summary>
-        /// <param name="sql">The raw SQL.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <returns>An <see cref="IQueryable{TEntity}" /> that contains elements that satisfy the condition specified by raw SQL.</returns>
-        [Obsolete]
-        public IQueryable<TEntity> FromSql(string sql, params object[] parameters) => _dbSet.FromSqlRaw(sql, parameters);
-
-        /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
-        /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <returns>The found entity or null.</returns>
-        public TEntity Find(params object[] keyValues) => _dbSet.Find(keyValues);
-
-        /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
-        /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <returns>A <see cref="Task{TEntity}" /> that represents the asynchronous insert operation.</returns>
-        public ValueTask<TEntity> FindAsync(params object[] keyValues) => _dbSet.FindAsync(keyValues);
-
-        /// <summary>
-        /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
-        /// </summary>
-        /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
-        public ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken) => _dbSet.FindAsync(keyValues, cancellationToken);
-
-        /// <summary>
-        /// Gets the count based on a predicate.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public int Count(Expression<Func<TEntity, bool>> predicate = null)
+        if (include != null)
         {
-            if (predicate == null)
+            query = include(query);
+        }
+
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        if (orderBy != null)
+        {
+            return orderBy(query).Select(selector).ToPagedList(pageIndex, pageSize);
+        }
+        else
+        {
+            return query.Select(selector).ToPagedList(pageIndex, pageSize);
+        }
+    }
+
+    /// <summary>
+    /// Gets the <see cref="IPagedList{TEntity}"/> based on a predicate, orderby delegate and page information. This method default no-tracking query.
+    /// </summary>
+    /// <param name="selector">The selector for projection.</param>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order elements.</param>
+    /// <param name="include">A function to include navigation properties</param>
+    /// <param name="pageIndex">The index of page.</param>
+    /// <param name="pageSize">The size of the page.</param>
+    /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+    /// <param name="cancellationToken">
+    ///     A <see cref="CancellationToken" /> to observe while waiting for the task to complete.
+    /// </param>
+    /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+    /// <remarks>This method default no-tracking query.</remarks>
+    public Task<IPagedList<TResult>> GetPagedListAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
+                                                                Expression<Func<TEntity, bool>> predicate = null,
+                                                                Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                                                Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+                                                                int pageIndex = 0,
+                                                                int pageSize = 20,
+                                                                bool disableTracking = true,
+                                                                CancellationToken cancellationToken = default(CancellationToken))
+        where TResult : class
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (disableTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        if (orderBy != null)
+        {
+            return orderBy(query).Select(selector).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+        }
+        else
+        {
+            return query.Select(selector).ToPagedListAsync(pageIndex, pageSize, 0, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Gets the first or default entity based on a predicate, orderby delegate and include delegate. This method default no-tracking query.
+    /// </summary>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order elements.</param>
+    /// <param name="include">A function to include navigation properties</param>
+    /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+    /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+    /// <remarks>This method default no-tracking query.</remarks>
+    public TEntity GetFirstOrDefault(Expression<Func<TEntity, bool>> predicate = null,
+                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                     Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+                                     bool disableTracking = true)
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (disableTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        if (orderBy != null)
+        {
+            return orderBy(query).FirstOrDefault();
+        }
+        else
+        {
+            return query.FirstOrDefault();
+        }
+    }
+
+    /// <summary>
+    /// Gets the first or default entity based on a predicate, orderby delegate and include delegate. This method default no-tracking query.
+    /// </summary>
+    /// <param name="selector">The selector for projection.</param>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="orderBy">A function to order elements.</param>
+    /// <param name="include">A function to include navigation properties</param>
+    /// <param name="disableTracking"><c>True</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
+    /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
+    /// <remarks>This method default no-tracking query.</remarks>
+    public TResult GetFirstOrDefault<TResult>(Expression<Func<TEntity, TResult>> selector,
+                                              Expression<Func<TEntity, bool>> predicate = null,
+                                              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                              Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+                                              bool disableTracking = true)
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (disableTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        if (orderBy != null)
+        {
+            return orderBy(query).Select(selector).FirstOrDefault();
+        }
+        else
+        {
+            return query.Select(selector).FirstOrDefault();
+        }
+    }
+
+    /// <summary>
+    /// Uses raw SQL queries to fetch the specified <typeparamref name="TEntity" /> data.
+    /// </summary>
+    /// <param name="sql">The raw SQL.</param>
+    /// <param name="parameters">The parameters.</param>
+    /// <returns>An <see cref="IQueryable{TEntity}" /> that contains elements that satisfy the condition specified by raw SQL.</returns>
+    [Obsolete]
+    public IQueryable<TEntity> FromSql(string sql, params object[] parameters) => _dbSet.FromSqlRaw(sql, parameters);
+
+    /// <summary>
+    /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
+    /// </summary>
+    /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
+    /// <returns>The found entity or null.</returns>
+    public TEntity Find(params object[] keyValues) => _dbSet.Find(keyValues);
+
+    /// <summary>
+    /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
+    /// </summary>
+    /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
+    /// <returns>A <see cref="Task{TEntity}" /> that represents the asynchronous insert operation.</returns>
+    public ValueTask<TEntity> FindAsync(params object[] keyValues) => _dbSet.FindAsync(keyValues);
+
+    /// <summary>
+    /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
+    /// </summary>
+    /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
+    public ValueTask<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken) => _dbSet.FindAsync(keyValues, cancellationToken);
+
+    /// <summary>
+    /// Gets the count based on a predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public int Count(Expression<Func<TEntity, bool>> predicate = null)
+    {
+        if (predicate == null)
+        {
+            return _dbSet.Count();
+        }
+        else
+        {
+            return _dbSet.Count(predicate);
+        }
+    }
+
+    /// <summary>
+    /// Inserts a new entity synchronously.
+    /// </summary>
+    /// <param name="entity">The entity to insert.</param>
+    public void Insert(TEntity entity)
+    {
+        var entry = _dbSet.Add(entity);
+    }
+
+    /// <summary>
+    /// Inserts a range of entities synchronously.
+    /// </summary>
+    /// <param name="entities">The entities to insert.</param>
+    public void Insert(params TEntity[] entities) => _dbSet.AddRange(entities);
+
+    /// <summary>
+    /// Inserts a range of entities synchronously.
+    /// </summary>
+    /// <param name="entities">The entities to insert.</param>
+    public void Insert(IEnumerable<TEntity> entities) => _dbSet.AddRange(entities);
+
+    /// <summary>
+    /// Inserts a new entity asynchronously.
+    /// </summary>
+    /// <param name="entity">The entity to insert.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous insert operation.</returns>
+    public ValueTask<EntityEntry<TEntity>> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+    {
+        return _dbSet.AddAsync(entity, cancellationToken);
+
+        // Shadow properties?
+        //var property = _dbContext.Entry(entity).Property("Created");
+        //if (property != null) {
+        //property.CurrentValue = DateTime.Now;
+        //}
+    }
+
+    /// <summary>
+    /// Inserts a range of entities asynchronously.
+    /// </summary>
+    /// <param name="entities">The entities to insert.</param>
+    /// <returns>A <see cref="Task" /> that represents the asynchronous insert operation.</returns>
+    public Task InsertAsync(params TEntity[] entities) => _dbSet.AddRangeAsync(entities);
+
+    /// <summary>
+    /// Inserts a range of entities asynchronously.
+    /// </summary>
+    /// <param name="entities">The entities to insert.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous insert operation.</returns>
+    public Task InsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken)) => _dbSet.AddRangeAsync(entities, cancellationToken);
+
+    /// <summary>
+    /// Updates the specified entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    public void Update(TEntity entity)
+    {
+        _dbSet.Update(entity);
+
+        // Shadow properties?
+        //var property = _dbContext.Entry(entity).Property("LastUpdated");
+        //if(property != null) {
+        //property.CurrentValue = DateTime.Now;
+        //}
+    }
+
+    /// <summary>
+    /// Updates the specified entities.
+    /// </summary>
+    /// <param name="entities">The entities.</param>
+    public void Update(params TEntity[] entities) => _dbSet.UpdateRange(entities);
+
+    /// <summary>
+    /// Updates the specified entities.
+    /// </summary>
+    /// <param name="entities">The entities.</param>
+    public void Update(IEnumerable<TEntity> entities) => _dbSet.UpdateRange(entities);
+
+    /// <summary>
+    /// Deletes the specified entity.
+    /// </summary>
+    /// <param name="entity">The entity to delete.</param>
+    public void Delete(TEntity entity) => _dbSet.Remove(entity);
+
+    /// <summary>
+    /// Deletes the entity by the specified primary key.
+    /// </summary>
+    /// <param name="id">The primary key value.</param>
+    public void Delete(object id)
+    {
+        // using a stub entity to mark for deletion
+        var typeInfo = typeof(TEntity).GetTypeInfo();
+        var key = _dbContext.Model.FindEntityType(typeInfo.Name).FindPrimaryKey().Properties.FirstOrDefault();
+        var property = typeInfo.GetProperty(key?.Name);
+        if (property != null)
+        {
+            var entity = Activator.CreateInstance<TEntity>();
+            property.SetValue(entity, id);
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+        }
+        else
+        {
+            var entity = _dbSet.Find(id);
+            if (entity != null)
             {
-                return _dbSet.Count();
-            }
-            else
-            {
-                return _dbSet.Count(predicate);
+                Delete(entity);
             }
         }
+    }
 
-        /// <summary>
-        /// Inserts a new entity synchronously.
-        /// </summary>
-        /// <param name="entity">The entity to insert.</param>
-        public void Insert(TEntity entity)
+    /// <summary>
+    /// Deletes the specified entities.
+    /// </summary>
+    /// <param name="entities">The entities.</param>
+    public void Delete(params TEntity[] entities) => _dbSet.RemoveRange(entities);
+
+    /// <summary>
+    /// Deletes the specified entities.
+    /// </summary>
+    /// <param name="entities">The entities.</param>
+    public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
+
+    public virtual IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate)
+    {
+        return _dbContext.Set<TEntity>().Where(predicate);
+    }
+
+    public virtual IQueryable<TEntity> AllIncluding(
+       params Expression<Func<TEntity, object>>[] includeProperties)
+    {
+        IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+        foreach (var includeProperty in includeProperties)
         {
-            var entry = _dbSet.Add(entity);
+            query = query.Include(includeProperty);
         }
 
-        /// <summary>
-        /// Inserts a range of entities synchronously.
-        /// </summary>
-        /// <param name="entities">The entities to insert.</param>
-        public void Insert(params TEntity[] entities) => _dbSet.AddRange(entities);
+        return query;
+    }
 
-        /// <summary>
-        /// Inserts a range of entities synchronously.
-        /// </summary>
-        /// <param name="entities">The entities to insert.</param>
-        public void Insert(IEnumerable<TEntity> entities) => _dbSet.AddRange(entities);
-
-        /// <summary>
-        /// Inserts a new entity asynchronously.
-        /// </summary>
-        /// <param name="entity">The entity to insert.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous insert operation.</returns>
-        public ValueTask<EntityEntry<TEntity>> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
-        {
-            return _dbSet.AddAsync(entity, cancellationToken);
-
-            // Shadow properties?
-            //var property = _dbContext.Entry(entity).Property("Created");
-            //if (property != null) {
-            //property.CurrentValue = DateTime.Now;
-            //}
-        }
-
-        /// <summary>
-        /// Inserts a range of entities asynchronously.
-        /// </summary>
-        /// <param name="entities">The entities to insert.</param>
-        /// <returns>A <see cref="Task" /> that represents the asynchronous insert operation.</returns>
-        public Task InsertAsync(params TEntity[] entities) => _dbSet.AddRangeAsync(entities);
-
-        /// <summary>
-        /// Inserts a range of entities asynchronously.
-        /// </summary>
-        /// <param name="entities">The entities to insert.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous insert operation.</returns>
-        public Task InsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken)) => _dbSet.AddRangeAsync(entities, cancellationToken);
-
-        /// <summary>
-        /// Updates the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        public void Update(TEntity entity)
-        {
-            _dbSet.Update(entity);
-
-            // Shadow properties?
-            //var property = _dbContext.Entry(entity).Property("LastUpdated");
-            //if(property != null) {
-            //property.CurrentValue = DateTime.Now;
-            //}
-        }
-
-        /// <summary>
-        /// Updates the specified entities.
-        /// </summary>
-        /// <param name="entities">The entities.</param>
-        public void Update(params TEntity[] entities) => _dbSet.UpdateRange(entities);
-
-        /// <summary>
-        /// Updates the specified entities.
-        /// </summary>
-        /// <param name="entities">The entities.</param>
-        public void Update(IEnumerable<TEntity> entities) => _dbSet.UpdateRange(entities);
-
-        /// <summary>
-        /// Deletes the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity to delete.</param>
-        public void Delete(TEntity entity) => _dbSet.Remove(entity);
-
-        /// <summary>
-        /// Deletes the entity by the specified primary key.
-        /// </summary>
-        /// <param name="id">The primary key value.</param>
-        public void Delete(object id)
-        {
-            // using a stub entity to mark for deletion
-            var typeInfo = typeof(TEntity).GetTypeInfo();
-            var key = _dbContext.Model.FindEntityType(typeInfo.Name).FindPrimaryKey().Properties.FirstOrDefault();
-            var property = typeInfo.GetProperty(key?.Name);
-            if (property != null)
-            {
-                var entity = Activator.CreateInstance<TEntity>();
-                property.SetValue(entity, id);
-                _dbContext.Entry(entity).State = EntityState.Deleted;
-            }
-            else
-            {
-                var entity = _dbSet.Find(id);
-                if (entity != null)
-                {
-                    Delete(entity);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Deletes the specified entities.
-        /// </summary>
-        /// <param name="entities">The entities.</param>
-        public void Delete(params TEntity[] entities) => _dbSet.RemoveRange(entities);
-
-        /// <summary>
-        /// Deletes the specified entities.
-        /// </summary>
-        /// <param name="entities">The entities.</param>
-        public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
-
-        public virtual IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate)
-        {
-            return _dbContext.Set<TEntity>().Where(predicate);
-        }
-
-        public virtual IQueryable<TEntity> AllIncluding(
-           params Expression<Func<TEntity, object>>[] includeProperties)
-        {
-            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
-            foreach (var includeProperty in includeProperties)
-            {
-                query = query.Include(includeProperty);
-            }
-
-            return query;
-        }
-
-        public IQueryable<TEntity> Query()
-        {
-            return _dbSet;
-        }
+    public IQueryable<TEntity> Query()
+    {
+        return _dbSet;
     }
 }

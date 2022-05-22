@@ -1,14 +1,13 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Blog.WebApi.Auth
+namespace Blog.WebApi.Auth;
+
+public interface IJwtFactory
 {
-    public interface IJwtFactory
-    {
-        Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity);
+    Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity);
 
-        ClaimsIdentity GenerateClaimsIdentity(string userName, string id);
+    ClaimsIdentity GenerateClaimsIdentity(string userName, string id);
 
-        bool ValidateTokenAsync(string token);
-    }
+    bool ValidateTokenAsync(string token);
 }

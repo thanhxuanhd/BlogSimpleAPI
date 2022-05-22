@@ -1,6 +1,5 @@
-﻿namespace Blog.Service.ViewModels
+﻿namespace Blog.Service.ViewModels;
+
+public class CommentViewModel
 {
-    public class CommentViewModel
-    {
-    }
 }

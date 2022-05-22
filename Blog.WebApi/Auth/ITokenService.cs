@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace Blog.WebApi.Auth
+namespace Blog.WebApi.Auth;
+
+public interface ITokenService
 {
-    public interface ITokenService
-    {
-        string GenerateAccessToken(IEnumerable<Claim> claims);
+    string GenerateAccessToken(IEnumerable<Claim> claims);
 
-        string GenerateRefreshToken();
+    string GenerateRefreshToken();
 
-        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
-    }
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 }

@@ -1,25 +1,24 @@
-﻿using System;
+﻿using Blog.Service.ViewModels;
+using System;
 using System.Collections.Generic;
-using Blog.Service.ViewModels;
 
-namespace Blog.Service.Interface
+namespace Blog.Service.Interface;
+
+public interface IPostCategoryService
 {
-    public interface IPostCategoryService
-    {
-        PagingViewModel<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord = "", string sortColumn = "");
+    PagingViewModel<PostCategoryViewModel> Get(int pageIndex, int pageSize, string keyWord = "", string sortColumn = "");
 
-        Guid Add(PostCategoryViewModel postCategory, Guid currentUserId);
+    Guid Add(PostCategoryViewModel postCategory, Guid currentUserId);
 
-        bool Update(PostCategoryViewModel postCategory, Guid currentUserId);
+    bool Update(PostCategoryViewModel postCategory, Guid currentUserId);
 
-        PostCategoryViewModel GetById(Guid id);
+    PostCategoryViewModel GetById(Guid id);
 
-        bool Delete(Guid id, Guid currentUserId);
+    bool Delete(Guid id, Guid currentUserId);
 
-        void Save();
+    void Save();
 
-        void UpdateParent(PostCategoryUpdateParentViewModel model, Guid currentUserId);
+    void UpdateParent(PostCategoryUpdateParentViewModel model, Guid currentUserId);
 
-        List<PostCategoryViewModel> GetAll();
-    }
+    List<PostCategoryViewModel> GetAll();
 }
