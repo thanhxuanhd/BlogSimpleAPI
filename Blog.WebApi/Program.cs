@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Blog.Core;
+﻿using Blog.Core;
 using Blog.Core.Model;
 using Blog.Infrastructure;
 using Blog.Service.Interface;
-using Blog.Service.Mapping;
 using Blog.Service.Service;
 using Blog.WebApi.Auth;
 using Blog.WebApi.Helpers;
@@ -162,8 +160,7 @@ void SetUpService(IServiceCollection services)
     services.Configure<Configurations>(options => builder.Configuration.GetSection(nameof(Configurations)).Bind(options));
 
     // Auto Mapper Config For Asp.Net Core
-    IMapper mapper = AutoMapperConfig.RegisterMappings().CreateMapper();
-    services.AddSingleton(mapper);
+    services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     //services.AddScoped<IMapper>(sp => new Mapper(mapper.ConfigurationProvider, sp.GetService));
 
     services.Configure<IdentityOptions>(options =>
