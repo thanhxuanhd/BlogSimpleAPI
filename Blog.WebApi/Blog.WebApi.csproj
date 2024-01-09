@@ -24,7 +24,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.0" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.34.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.0" />
@@ -33,7 +33,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.4.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.4.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.4.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
 	</ItemGroup>
 
 	<ItemGroup>
